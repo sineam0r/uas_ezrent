@@ -21,6 +21,13 @@ class _FormScreenState extends State<FormScreen> {
   final TextEditingController _telpController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
 
+  String _paymentCategory = 'Tunai';
+  String _selectedPaymentMethod = 'Tunai';
+  final Map<String, List<String>> _paymentMethods = {
+    'Tunai': ['Tunai'],
+    'Transfer Bank': ['BCA', 'Mandiri', 'BNI', 'BRI', 'Bank Lainnya'],
+    'E-Wallet': ['GoPay', 'OVO', 'DANA', 'ShopeePay', 'LinkAja'],
+  };
   int _rentalDays = 0;
   double _totalHarga = 0;
 
@@ -61,6 +68,72 @@ class _FormScreenState extends State<FormScreen> {
       });
       _calculateTotal();
     }
+  }
+
+  Widget _buildPaymentMethodSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Metode Pembayaran',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: _paymentCategory,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _paymentCategory = newValue!;
+                  _selectedPaymentMethod = _paymentMethods[newValue]!.first;
+                });
+              },
+              items: _paymentMethods.keys.map<DropdownMenuItem<String>>((String category) {
+                return DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: _selectedPaymentMethod,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedPaymentMethod = newValue!;
+                });
+              },
+              items: _paymentMethods[_paymentCategory]!.map<DropdownMenuItem<String>>((String method) {
+                return DropdownMenuItem<String>(
+                  value: method,
+                  child: Text(method),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -265,7 +338,7 @@ class _FormScreenState extends State<FormScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Durasi Sewa'),
+                            const Text('Durasi Sewa'),
                             Text('$_rentalDays Hari')
                           ],
                         ),
@@ -289,28 +362,31 @@ class _FormScreenState extends State<FormScreen> {
                               ),
                             )
                           ],
-                        )
+                        ),
+                        const SizedBox(height: 16),
+                        _buildPaymentMethodSection(),
                       ],
                     ),
                   ),
                 ),
               const SizedBox(height: 24),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate() && 
+                    if (_formKey.currentState!.validate() &&
                         _startDate != null &&
                         _endDate != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Pemesanan Berhasil'),
-                        )
-                      );
-                      Navigator.pop(context);
-                    } else if (_startDate == null || _endDate == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Pemesanan Berhasil Dengan Metode Pembayaran $_selectedPaymentMethod'
+                            ),
+                          )
+                        );
+                        Navigator.pop(context);
+                      } else if (_startDate == null || _endDate == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Pilih periode sewa'),
                         )
@@ -336,3 +412,4 @@ class _FormScreenState extends State<FormScreen> {
     );
   }
 }
+
