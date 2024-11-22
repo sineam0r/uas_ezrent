@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/form_screen.dart';
 
-class DetailsScreen extends StatelessWidget {
+class DetailsScreen extends StatefulWidget {
   final Vehicle vehicle;
 
   const DetailsScreen({
@@ -10,17 +10,37 @@ class DetailsScreen extends StatelessWidget {
   });
 
   @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  void _toggleFavorite() {
+    setState(() {
+      widget.vehicle.isFavorite = !widget.vehicle.isFavorite;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${vehicle.brand} ${vehicle.nama}'),
+        title: Text('${widget.vehicle.brand} ${widget.vehicle.nama}'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              widget.vehicle.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: widget.vehicle.isFavorite ? Colors.red : null,
+            ),
+            onPressed: _toggleFavorite,
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset(
-              vehicle.imageUrl,
+              widget.vehicle.imageUrl,
               width: double.infinity,
               height: 250,
               fit: BoxFit.cover,
@@ -31,7 +51,7 @@ class DetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${vehicle.brand} ${vehicle.nama}',
+                    '${widget.vehicle.brand} ${widget.vehicle.nama}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -39,7 +59,7 @@ class DetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Rp ${vehicle.tarif.toStringAsFixed(0)}/hari',
+                    'Rp ${widget.vehicle.tarif.toStringAsFixed(0)}/hari',
                     style: TextStyle(
                       color: Colors.blue[700],
                       fontSize: 20,
@@ -55,9 +75,9 @@ class DetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildSpecItem(Icons.car_rental, 'Tipe', vehicle.type),
-                  _buildSpecItem(Icons.settings, 'Transmisi', vehicle.transmisi),
-                  _buildSpecItem(Icons.people, 'Kapasitas', '${vehicle.kapasitas} Orang'),
+                  _buildSpecItem(Icons.car_rental, 'Tipe', widget.vehicle.type),
+                  _buildSpecItem(Icons.settings, 'Transmisi', widget.vehicle.transmisi),
+                  _buildSpecItem(Icons.people, 'Kapasitas', '${widget.vehicle.kapasitas} Orang'),
                   const SizedBox(height: 16),
                   const Text(
                     'Deskripsi',
@@ -67,17 +87,17 @@ class DetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(vehicle.deskripsi),
+                  Text(widget.vehicle.deskripsi),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: vehicle.isAvailable
+                      onPressed: widget.vehicle.isAvailable
                         ? () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => FormScreen(vehicle: vehicle)
+                              builder: (context) => FormScreen(vehicle: widget.vehicle)
                             )
                           );
                         }
@@ -89,7 +109,7 @@ class DetailsScreen extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        vehicle.isAvailable ? 'Sewa Sekarang' : 'Tidak Tersedia',
+                        widget.vehicle.isAvailable ? 'Sewa Sekarang' : 'Tidak Tersedia',
                         style: const TextStyle(
                           fontSize: 16
                         ),
