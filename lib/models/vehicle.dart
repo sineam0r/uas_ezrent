@@ -9,6 +9,7 @@ class Vehicle {
   final String deskripsi;
   final String transmisi;
   final int kapasitas;
+  bool isFavorite;
 
   Vehicle({
     required this.id,
@@ -21,5 +22,6 @@ class Vehicle {
     required this.deskripsi,
     required this.transmisi,
     required this.kapasitas,
+    this.isFavorite = false,
   });
 }

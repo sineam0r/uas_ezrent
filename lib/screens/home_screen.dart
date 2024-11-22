@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:uas_ezrent/data/dummy_data.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/details_screen.dart';
+import 'package:uas_ezrent/screens/favorite_screen.dart';
+import 'package:uas_ezrent/screens/history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +17,28 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = 'Semua';
   List<Vehicle> _filteredVehicles = [];
   bool _isListView = false;
+
+  int _selectedIndex = 0;
+
+final List<Widget> _screens = [
+  const HomeScreen(),
+  const FavoritesScreen(),
+  const HistoryScreen(),
+];
+
+void _onItemTapped(int index) {
+  if (index == _selectedIndex) return;
+
+  setState(() {
+    _selectedIndex = index;
+  });
+
+  Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => _screens[index],
+      ),
+  );
+}
 
   @override
   void initState() {
@@ -63,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('EZRent'),
         actions: [
-          // Toggle View Button
           IconButton(
             icon: Icon(_isListView ? Icons.grid_view : Icons.view_list),
             onPressed: () {
@@ -72,7 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
           ),
-          // Tambahkan filter harga
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list),
             onSelected: (String result) {
@@ -249,6 +271,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -268,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAvailableVehicleList() {
-    return _isListView 
+    return _isListView
       ? GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -291,7 +315,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
   }
 
-  // Kartu kendaraan untuk tampilan grid
   Widget _buildVehicleCard(BuildContext context, Vehicle vehicle) {
     return GestureDetector(
       onTap: () => _navigateToDetails(context, vehicle),
@@ -331,7 +354,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Kartu kendaraan untuk tampilan horizontal
   Widget _buildHorizontalVehicleCard(BuildContext context, Vehicle vehicle) {
     return Container(
       width: 280,
@@ -372,7 +394,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Tag ketersediaan kendaraan
   Widget _buildAvailabilityTag(Vehicle vehicle) {
     return Align(
       alignment: Alignment.topRight,
@@ -399,7 +420,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Detail kendaraan
   Widget _buildVehicleDetails(Vehicle vehicle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +466,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Navigasi ke halaman detail
   void _navigateToDetails(BuildContext context, Vehicle vehicle) {
     Navigator.push(
       context,

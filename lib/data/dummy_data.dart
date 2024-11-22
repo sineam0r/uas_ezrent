@@ -21,7 +21,8 @@ final List<Vehicle> dummyVehicles = [
     type: 'Mobil',
     deskripsi: 'Mitsubishi Xpander Ultimate 2023',
     transmisi: 'Automatic',
-    kapasitas: 7
+    kapasitas: 7,
+    isFavorite: true
   ),
   Vehicle(
     id: '3',
