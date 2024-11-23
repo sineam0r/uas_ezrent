@@ -292,6 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [

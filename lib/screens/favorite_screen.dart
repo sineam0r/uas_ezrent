@@ -19,28 +19,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const FavoritesScreen(),
+    const Placeholder(),
     const HistoryScreen(),
   ];
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return;
-
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => _screens[index],
-      ),
-    );
-  }
 
   @override
   void initState() {
     super.initState();
-    _favoriteVehicles = dummyVehicles.where((vehicle) => vehicle.isFavorite).toList();
+    _favoriteVehicles = dummyVehicles.where((v) => v.isFavorite).toList();
+  }
+
+  void _onItemTapped(int index) {
+    if (index != _selectedIndex) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => _screens[index],
+        ),
+      );
+    }
   }
 
   void _toggleFavorite(Vehicle vehicle) {
@@ -52,21 +48,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _favoriteVehicles = dummyVehicles.where((v) => v.isFavorite).toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorit Kendaraan'),
+        title: const Text('Kendaraan Favorit'),
       ),
       body: _favoriteVehicles.isEmpty
-        ? _buildEmptyState()
-        : ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: _favoriteVehicles.length,
-            itemBuilder: (context, index) {
-              final vehicle = _favoriteVehicles[index];
-              return _buildFavoriteItem(vehicle);
-            },
-        ),
-        bottomNavigationBar: BottomNavigationBar(
+          ? _buildEmptyState()
+          : ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _favoriteVehicles.length,
+              itemBuilder: (context, index) {
+                final vehicle = _favoriteVehicles[index];
+                return _buildFavoriteItem(vehicle);
+              },
+            ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
@@ -92,25 +91,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       child: ListTile(
         leading: Image.asset(
-          vehicle.imageUrl,
+          vehicle.imageUrl.isNotEmpty ? vehicle.imageUrl : 'assets/images/placeholder.png',
           width: 80,
           height: 80,
           fit: BoxFit.cover,
         ),
         title: Text(
           '${vehicle.brand} ${vehicle.nama}',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           'Rp ${vehicle.tarif.toStringAsFixed(0)}/hari',
-          style: TextStyle(
-            color: Colors.blue[700],
-          ),
+          style: TextStyle(color: Colors.blue[700]),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.favorite, color: Colors.red),
+          icon: Icon(
+            vehicle.isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: vehicle.isFavorite ? Colors.red : Colors.grey,
+          ),
           onPressed: () => _toggleFavorite(vehicle),
         ),
         onTap: () {
@@ -119,7 +117,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             MaterialPageRoute(
               builder: (context) => DetailsScreen(vehicle: vehicle),
             ),
-          );
+          ).then((_) {
+            setState(() {
+              _favoriteVehicles = dummyVehicles.where((v) => v.isFavorite).toList();
+            });
+          });
         },
       ),
     );
@@ -136,20 +138,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             color: Colors.grey[400],
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'Belum ada kendaraan favorit',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Tambahkan kendaraan ke favorit dari halaman detail',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ],
       ),

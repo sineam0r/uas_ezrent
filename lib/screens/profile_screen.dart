@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -15,21 +18,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _name = 'John Doe';
   String _phone = '081234567890';
   String _address = 'Jl. jalan No. 123';
-  File? _ktpImage;
-  File? _simImage;
+  dynamic _ktpImage;
+  dynamic _simImage;
 
   Future<void> _pickImage(ImageSource source, String type) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: source);
 
     if (image != null) {
-      setState(() {
-        if (type == 'ktp') {
-          _ktpImage = File(image.path);
-        } else {
-          _simImage = File(image.path);
-        }
-      });
+      if (kIsWeb) {
+        final bytes = await image.readAsBytes();
+        setState(() {
+          if (type == 'ktp') {
+            _ktpImage = bytes;
+          } else {
+            _simImage = bytes;
+          }
+        });
+      } else {
+        setState(() {
+          if (type == 'ktp') {
+            _ktpImage = File(image.path);
+          } else {
+            _simImage = File(image.path);
+          }
+        });
+      }
     }
   }
 
@@ -163,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildDocumentUpload(
     String title,
-    File? image,
+    dynamic image,
     VoidCallback onGalleryTap,
     VoidCallback onCameraTap,
   ) {
@@ -204,12 +218,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 )
               : Stack(
                   children: [
-                    Image.file(
-                      image,
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
+                    if  (kIsWeb && image is Uint8List)
+                      Image.memory(
+                        image,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
+                    else if (!kIsWeb && image is File)
+                      Image.file(
+                        image,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
                     Positioned(
                       right: 8,
                       top: 8,

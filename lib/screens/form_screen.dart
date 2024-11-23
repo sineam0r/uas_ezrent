@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
+import 'package:uas_ezrent/screens/history_screen.dart';
 
 class FormScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -43,8 +44,11 @@ class _FormScreenState extends State<FormScreen> {
     if (_startDate != null && _endDate != null) {
       _rentalDays = _endDate!.difference(_startDate!).inDays + 1;
       _totalHarga = _rentalDays * widget.vehicle.tarif;
-      setState(() {});
+    } else {
+      _rentalDays = 0;
+      _totalHarga = 0;
     }
+    setState(() {});
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
@@ -301,6 +305,8 @@ class _FormScreenState extends State<FormScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nomor telepon harus diisi';
+                  } else if (!RegExp(r'^\d+$').hasMatch(value)) {
+                    return 'Nomor telepon hanya boleh berisi angka';
                   }
                   return null;
                 },
@@ -377,19 +383,36 @@ class _FormScreenState extends State<FormScreen> {
                     if (_formKey.currentState!.validate() &&
                         _startDate != null &&
                         _endDate != null) {
+                      final rentalData = {
+                        'vehicle': widget.vehicle,
+                        'startDate': _startDate!,
+                        'endDate': _endDate!,
+                        'totalCost': _totalHarga,
+                        'status': 'Berlangsung',
+                      };
+
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Pemesanan Berhasil Dengan Metode Pembayaran $_selectedPaymentMethod'
+                              'Pemesanan berhasil! total: Rp ${_totalHarga.toStringAsFixed(0)}. Pembayaran via $_selectedPaymentMethod',
                             ),
                           )
                         );
-                        Navigator.pop(context);
-                      } else if (_startDate == null || _endDate == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+
+                        Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HistoryScreen(
+                            newRental: rentalData,
+                          ),
+                        ),
+                        (route) => false,
+                      );
+                    } else if (_startDate == null || _endDate == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Pilih periode sewa'),
-                        )
+                        ),
                       );
                     }
                   },
@@ -399,9 +422,11 @@ class _FormScreenState extends State<FormScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     )
                   ),
-                  child: const Text(
-                    'Pesan Sekarang',
-                    style: TextStyle(fontSize: 16),
+                  child: Text(
+                    _totalHarga > 0
+                        ? 'Pesan Sekarang (Rp ${_totalHarga.toStringAsFixed(0)})'
+                        : 'Pesan Sekarang',
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               )
@@ -412,4 +437,5 @@ class _FormScreenState extends State<FormScreen> {
     );
   }
 }
+
 

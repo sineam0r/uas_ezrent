@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:uas_ezrent/data/dummy_data.dart';
 import 'package:uas_ezrent/screens/favorite_screen.dart';
 import 'package:uas_ezrent/screens/home_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  final Map<String, dynamic>? newRental;
+
+  const HistoryScreen({super.key, this.newRental});
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
@@ -17,7 +18,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 final List<Widget> _screens = [
   const HomeScreen(),
   const FavoritesScreen(),
-  const HistoryScreen(),
+  const Placeholder(),
 ];
 
 void _onItemTapped(int index) {
@@ -34,22 +35,15 @@ void _onItemTapped(int index) {
   );
 }
 
-  final List<Map<String, dynamic>> _rentalHistory = [
-    {
-      'vehicle': dummyVehicles[0],
-      'startDate': DateTime(2023, 6, 15),
-      'endDate': DateTime(2023, 6, 20),
-      'totalCost': 1500000,
-      'status': 'Selesai'
-    },
-    {
-      'vehicle': dummyVehicles[2],
-      'startDate': DateTime(2023, 7, 5),
-      'endDate': DateTime(2023, 7, 10),
-      'totalCost': 2000000,
-      'status': 'Selesai'
-    },
-  ];
+  final List<Map<String, dynamic>> _rentalHistory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.newRental != null) {
+      _rentalHistory.add(widget.newRental!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +51,7 @@ void _onItemTapped(int index) {
       appBar: AppBar(
         title: const Text('Riwayat Sewa'),
       ),
-      body: _rentalHistory.isEmpty 
+      body: _rentalHistory.isEmpty
         ? _buildEmptyState()
         : ListView.builder(
             padding: const EdgeInsets.all(16.0),
@@ -68,6 +62,7 @@ void _onItemTapped(int index) {
             },
         ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [

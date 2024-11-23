@@ -40,7 +40,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset(
-              widget.vehicle.imageUrl,
+              widget.vehicle.imageUrl.isNotEmpty
+                ? widget.vehicle.imageUrl
+                : 'img/avanza.jpg',
               width: double.infinity,
               height: 250,
               fit: BoxFit.cover,
