@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
+import 'package:uas_ezrent/screens/booking_screen.dart';
 
 class VehicleBookingButton extends StatelessWidget {
   final VehicleModel vehicle;
@@ -30,7 +31,8 @@ class VehicleBookingButton extends StatelessWidget {
                         return AlertDialog(
                           title: const Text('Peringatan'),
                           content: const Text(
-                              'Mohon pilih durasi rental terlebih dahulu'),
+                            'Mohon pilih durasi rental terlebih dahulu'
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -43,13 +45,14 @@ class VehicleBookingButton extends StatelessWidget {
                       },
                     );
                   } else {
-                    Navigator.pushNamed(
+                    Navigator.push(
                       context,
-                      '/booking',
-                      arguments: {
-                        'vehicle': vehicle,
-                        'duration': selectedRentalDuration,
-                      },
+                      MaterialPageRoute(
+                        builder: (context) => BookingScreen(
+                          vehicle: vehicle,
+                          rentalDuration: selectedRentalDuration,
+                        ),
+                      ),
                     );
                   }
                 }
@@ -74,3 +77,4 @@ class VehicleBookingButton extends StatelessWidget {
     );
   }
 }
+
