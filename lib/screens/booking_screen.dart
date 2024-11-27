@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
-import 'package:uas_ezrent/screens/home_screen.dart';
+import 'package:uas_ezrent/screens/confirmation_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final VehicleModel vehicle;
@@ -45,45 +45,19 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _submitBooking() {
-    if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Konfirmasi Booking'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Kendaraan: ${widget.vehicle.brand} ${widget.vehicle.name}'),
-              Text('Durasi: ${widget.rentalDuration} hari'),
-              Text('Total Biaya: Rp ${NumberFormat('#,###').format(_totalPrice)}'),
-              const SizedBox(height: 16),
-              const Text(
-                'Booking Anda sedang diproses.',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                'Tim kami akan segera menghubungi Anda.',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  (route) => false
-                );
-              },
-              child: const Text('OK'),
-            ),
-          ],
+  if (_formKey.currentState!.validate()) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConfirmationScreen(
+          vehicleDetails: '${widget.vehicle.brand} ${widget.vehicle.name}',
+          rentalDuration: widget.rentalDuration,
+          totalPrice: _totalPrice,
         ),
-      );
-    }
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +74,6 @@ class _BookingScreenState extends State<BookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Vehicle Details Section
                 Card(
                   elevation: 4,
                   child: Padding(
@@ -149,8 +122,6 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Personal Information Section
                 const Text(
                   'Informasi Pribadi',
                   style: TextStyle(
@@ -184,7 +155,6 @@ class _BookingScreenState extends State<BookingScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Mohon masukkan nomor telepon';
                     }
-                    // Basic phone number validation
                     if (!RegExp(r'^[0-9]{10,12}$').hasMatch(value)) {
                       return 'Nomor telepon tidak valid';
                     }
@@ -203,7 +173,6 @@ class _BookingScreenState extends State<BookingScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Mohon masukkan email';
                     }
-                    // Basic email validation
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                       return 'Email tidak valid';
                     }
@@ -226,8 +195,6 @@ class _BookingScreenState extends State<BookingScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // Payment Method Section
                 const Text(
                   'Metode Pembayaran',
                   style: TextStyle(
@@ -261,8 +228,6 @@ class _BookingScreenState extends State<BookingScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-
-                // Submit Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -294,7 +259,6 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   void dispose() {
-    // Dispose controllers to prevent memory leaks
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
