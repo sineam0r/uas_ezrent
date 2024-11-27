@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
+import 'package:uas_ezrent/screens/auth/login_screen.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_Screen.dart';
 import 'package:uas_ezrent/widgets/home/category_filter.dart';
 import 'package:uas_ezrent/widgets/home/promo_card.dart';
@@ -85,6 +86,17 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Promo'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
               },
             ),
           ],
