@@ -1,4 +1,4 @@
-package com.example.uas_ezrent
+package com.ezrent.app
 
 import io.flutter.embedding.android.FlutterActivity
 
