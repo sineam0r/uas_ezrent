@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
-import 'package:uas_ezrent/widgets/category_filter.dart';
-import 'package:uas_ezrent/widgets/promo_card.dart';
-import 'package:uas_ezrent/widgets/vehicle_card.dart';
+import 'package:uas_ezrent/screens/vehicle_detail_Screen.dart';
+import 'package:uas_ezrent/widgets/home/category_filter.dart';
+import 'package:uas_ezrent/widgets/home/promo_card.dart';
+import 'package:uas_ezrent/widgets/home/vehicle_card.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Rental Kendaraan',
+          'EZRent',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -54,17 +55,64 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            Container(
+              height: 80,
+              color: Colors.blue,
+              child: const Padding(
+                padding: EdgeInsets.only(left: 16.0, top: 32.0),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profil'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_offer),
+              title: const Text('Promo'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: PromoCard(
-                title: 'Diskon 50% Minggu Ini!',
-                subtitle: 'Untuk semua kendaraan baru',
-                onTap: () {
-                },
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    PromoCard(
+                      title: 'Diskon 50% Minggu Ini!',
+                      subtitle: 'Untuk semua kendaraan baru',
+                      onTap: () {},
+                    ),
+                    const SizedBox(width: 1),
+                    PromoCard(
+                      title: 'Promo Akhir Tahun',
+                      subtitle: 'Hemat sampai Rp 100.000',
+                      onTap: () {},
+                    ),
+                  ],
+                ),
               ),
             ),
             const Padding(
@@ -103,7 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/vehicle');
                     },
-                    child: const Text('Lihat Semua'),
+                    child: Text('Lihat Semua',
+                      style: TextStyle(
+                        color: Colors.blue[900]
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -122,10 +174,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 return VehicleCard(
                   vehicle: _displayedVehicles[index],
                   onTap: () {
-                    Navigator.pushNamed(
-                      context, 
-                      '/vehicle-detail', 
-                      arguments: _displayedVehicles[index]
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VehicleDetailScreen(vehicle: _displayedVehicles[index]),
+                      ),
                     );
                   },
                 );
@@ -168,3 +221,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
