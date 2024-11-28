@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
-import 'package:uas_ezrent/screens/auth/login_screen.dart';
-import 'package:uas_ezrent/screens/vehicle_detail_Screen.dart';
+import 'package:uas_ezrent/screens/favorite_screen.dart';
+import 'package:uas_ezrent/screens/profile_screen.dart';
+import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
 import 'package:uas_ezrent/widgets/home/category_filter.dart';
 import 'package:uas_ezrent/widgets/home/promo_card.dart';
 import 'package:uas_ezrent/widgets/home/vehicle_card.dart';
@@ -24,11 +25,121 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _selectedCategory = 'Semua';
   List<VehicleModel> _displayedVehicles = [];
+  int _currentIndex = 0;
+
+  late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _displayedVehicles = DummyVehicles.popularVehicles;
+
+    _screens = [
+      _buildBody(),
+      const FavoriteScreen(),
+    ];
+  }
+
+  Widget _buildBody() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  PromoCard(
+                    title: 'Diskon 50% Minggu Ini!',
+                    subtitle: 'Untuk semua kendaraan baru',
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 1),
+                  PromoCard(
+                    title: 'Promo Akhir Tahun',
+                    subtitle: 'Hemat sampai Rp 100.000',
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Kategori Kendaraan',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          CategoryFilter(
+            categories: categories,
+            selectedCategory: _selectedCategory,
+            onCategorySelected: (category) {
+              setState(() {
+                _selectedCategory = category;
+                _displayedVehicles = DummyVehicles.getVehiclesByCategory(category);
+              });
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Kendaraan Populer',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // vehicle screen
+                  },
+                  child: Text(
+                    'Lihat Semua',
+                    style: TextStyle(color: Colors.blue[900]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.7,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: _displayedVehicles.length,
+            itemBuilder: (context, index) {
+              return VehicleCard(
+                vehicle: _displayedVehicles[index],
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VehicleDetailScreen(
+                        vehicle: _displayedVehicles[index],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -47,11 +158,13 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
+              // notifikasi
             },
           ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
+              // search
             },
           ),
         ],
@@ -79,6 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Profil'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                );
               },
             ),
             ListTile(
@@ -86,121 +203,15 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Promo'),
               onTap: () {
                 Navigator.pop(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
+                // promo screen
               },
             ),
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    PromoCard(
-                      title: 'Diskon 50% Minggu Ini!',
-                      subtitle: 'Untuk semua kendaraan baru',
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 1),
-                    PromoCard(
-                      title: 'Promo Akhir Tahun',
-                      subtitle: 'Hemat sampai Rp 100.000',
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Kategori Kendaraan',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            CategoryFilter(
-              categories: categories,
-              selectedCategory: _selectedCategory,
-              onCategorySelected: (category) {
-                setState(() {
-                  _selectedCategory = category;
-                  _displayedVehicles = DummyVehicles.getVehiclesByCategory(category);
-                });
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Kendaraan Populer',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/vehicle');
-                    },
-                    child: Text('Lihat Semua',
-                      style: TextStyle(
-                        color: Colors.blue[900]
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: _displayedVehicles.length,
-              itemBuilder: (context, index) {
-                return VehicleCard(
-                  vehicle: _displayedVehicles[index],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VehicleDetailScreen(vehicle: _displayedVehicles[index]),
-                      ),
-                    );
-                  },
-                );
-              },
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-          ],
-        ),
-      ),
+      body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -215,22 +226,13 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Riwayat',
           ),
         ],
-        currentIndex: 0,
         selectedItemColor: Colors.blue,
         onTap: (index) {
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/favorites');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/history');
-              break;
-          }
+          setState(() {
+            _currentIndex = index;
+          });
         },
       ),
     );
   }
 }
-

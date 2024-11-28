@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/widgets/detail/vehicle_booking_button.dart';
@@ -18,6 +20,32 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
   bool _isFavorite = false;
   DateTime? _startDate;
   DateTime? _endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      final favoriteSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .collection('favorites')
+          .where('vehicleId', isEqualTo: widget.vehicle.id)
+          .get();
+
+      setState(() {
+        _isFavorite = favoriteSnapshot.docs.isNotEmpty;
+      });
+    } catch (e) {
+      print('Error checking favorite status: $e');
+    }
+  }
 
   int get _rentalDuration {
     if (_startDate != null && _endDate != null) {
@@ -67,6 +95,57 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
     }
   }
 
+  Future<void> _toggleFavorite() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan login untuk menambahkan favorit.')),
+      );
+      return;
+    }
+
+    try {
+      final favoritesRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .collection('favorites');
+
+      if (_isFavorite) {
+        final querySnapshot = await favoritesRef
+            .where('vehicleId', isEqualTo: widget.vehicle.id)
+            .get();
+
+        for (var doc in querySnapshot.docs) {
+          await doc.reference.delete();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kendaraan dihapus dari favorit')),
+        );
+      } else {
+        await favoritesRef.add({
+          'vehicleId': widget.vehicle.id,
+          'vehicleName': widget.vehicle.name,
+          'vehicleDetails': '${widget.vehicle.brand} - ${widget.vehicle.year}',
+          'createdAt': Timestamp.now(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kendaraan berhasil ditambahkan ke favorit!')),
+        );
+      }
+
+      setState(() {
+        _isFavorite = !_isFavorite;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mengubah status favorit')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final VehicleModel vehicle = widget.vehicle;
@@ -93,7 +172,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           '${vehicle.brand} ${vehicle.name}',
@@ -102,16 +180,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        const Spacer(),
                         IconButton(
                           icon: Icon(
                             _isFavorite ? Icons.favorite : Icons.favorite_border,
                             color: _isFavorite ? Colors.red : Colors.grey,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isFavorite = !_isFavorite;
-                            });
-                          },
+                          onPressed: _toggleFavorite,
                         ),
                       ],
                     ),
@@ -192,4 +267,3 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
     );
   }
 }
-

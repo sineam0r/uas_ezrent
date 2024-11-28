@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/screens/auth/register_screen.dart';
 import 'package:uas_ezrent/screens/home_screen.dart';
+import 'package:uas_ezrent/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,35 +14,32 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService();
 
   bool _isLoading = false;
   bool _showPassword = false;
 
   Future<void> _login() async {
-    try {
-      setState(() => _isLoading = true);
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+    setState(() => _isLoading = true);
+
+    final result = await _authService.login(
+      context: context,
+      email: _emailController.text,
+      password: _passwordController.text
+    );
+
+    if (result['success']) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
-    } on FirebaseAuthException catch (e) {
-      String message = 'Login gagal. Silakan coba lagi.';
-      if (e.code == 'user-not-found') {
-        message = 'Pengguna tidak ditemukan.';
-      } else if (e.code == 'wrong-password') {
-        message = 'Kata sandi salah.';
-      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(result['message'])),
       );
-    } finally {
-      setState(() => _isLoading = false);
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override

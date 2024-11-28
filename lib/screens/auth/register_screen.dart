@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uas_ezrent/services/auth_service.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,7 +14,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _nameController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   bool _isLoading = false;
   bool _obscureTextPassword = true;
@@ -32,37 +33,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+    final result = await _authService.register(
+      context: context,
+      email: _emailController.text,
+      password: _passwordController.text,
+      name: _nameController.text
+    );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pendaftaran berhasil! Silakan login.', style: GoogleFonts.lato())),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['message'], style: GoogleFonts.lato())),
+    );
 
+    if (result['success']) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
-    } on FirebaseAuthException catch (e) {
-      String message = 'Pendaftaran gagal. Silakan coba lagi.';
-      if (e.code == 'email-already-in-use') {
-        message = 'Email sudah digunakan.';
-      } else if (e.code == 'weak-password') {
-        message = 'Kata sandi terlalu lemah.';
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message, style: GoogleFonts.lato())),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +69,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelStyle: const TextStyle(color: Colors.black),
+                prefixIcon: const Icon(Icons.person),
+                labelText: 'Nama Lengkap',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.blue),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
