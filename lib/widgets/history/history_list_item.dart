@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/booking.dart';
-import 'package:uas_ezrent/screens/history_screen.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/widgets/history/history_date_info.dart';
 import 'package:uas_ezrent/widgets/history/history_price_info.dart';

@@ -3,9 +3,9 @@ import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/favorite_screen.dart';
 import 'package:uas_ezrent/screens/history_screen.dart';
 import 'package:uas_ezrent/screens/profile_screen.dart';
+import 'package:uas_ezrent/screens/promo_screen.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
 import 'package:uas_ezrent/widgets/home/category_filter.dart';
-import 'package:uas_ezrent/widgets/home/promo_card.dart';
 import 'package:uas_ezrent/widgets/home/vehicle_card.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
 
@@ -47,33 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  PromoCard(
-                    title: 'Diskon 50% Minggu Ini!',
-                    subtitle: 'Untuk semua kendaraan baru',
-                    onTap: () {},
-                  ),
-                  const SizedBox(width: 1),
-                  PromoCard(
-                    title: 'Promo Akhir Tahun',
-                    subtitle: 'Hemat sampai Rp 100.000',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-          ),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.all(16.0),
             child: Text(
               'Kategori Kendaraan',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -96,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Text(
                   'Kendaraan Populer',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -205,7 +184,10 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Promo'),
               onTap: () {
                 Navigator.pop(context);
-                // promo screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PromoScreen()),
+                );
               },
             ),
           ],

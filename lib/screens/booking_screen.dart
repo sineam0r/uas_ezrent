@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uas_ezrent/models/promo.dart';
 import 'package:uas_ezrent/models/user.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/models/booking.dart';
+import 'package:uas_ezrent/screens/promo_screen.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/services/profile_service.dart';
 import 'package:uas_ezrent/screens/confirmation_screen.dart';
@@ -34,6 +36,7 @@ class _BookingScreenState extends State<BookingScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _promoCodeController = TextEditingController();
 
   String? _selectedPaymentMethod;
   final List<String> _paymentMethods = [
@@ -44,7 +47,10 @@ class _BookingScreenState extends State<BookingScreen> {
 
   late DateTime _startDate;
   late DateTime _endDate;
+  late double _originalPrice;
   late double _totalPrice;
+  double _discountAmount = 0;
+  String? _appliedPromoCode;
   UserModel? _currentUser;
   bool _isLoading = true;
 
@@ -53,7 +59,8 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
     _startDate = widget.startDate;
     _endDate = widget.endDate;
-    _totalPrice = widget.vehicle.pricePerDay * widget.rentalDuration;
+    _originalPrice = widget.vehicle.pricePerDay * widget.rentalDuration;
+    _totalPrice = _originalPrice;
     _fetchUserProfile();
   }
 
@@ -76,6 +83,63 @@ class _BookingScreenState extends State<BookingScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal memuat profil: $e')),
+      );
+    }
+  }
+
+  void _applyPromoCode() {
+    final promoCode = _promoCodeController.text.trim().toUpperCase();
+    final promos = {
+      'NEWWEEK50': PromoModel(
+        title: 'Diskon 50%',
+        description: 'Untuk semua kendaraan',
+        code: 'NEWWEEK50',
+        discount: 0.5,
+        validUntil: DateTime.now().add(const Duration(days: 7)),
+      ),
+      'NEWYEAR100': PromoModel(
+        title: 'Diskon Rp 100.000',
+        description: 'Potongan harga',
+        code: 'NEWYEAR100',
+        discount: 100000,
+        validUntil: DateTime.now().add(const Duration(days: 30)),
+      ),
+    };
+
+    final promo = promos[promoCode];
+
+    if (promo != null && promo.validUntil.isAfter(DateTime.now())) {
+      setState(() {
+        _appliedPromoCode = promoCode;
+        if (promo.discount is double) {
+          _discountAmount = _originalPrice * promo.discount;
+        } else {
+          _discountAmount = (promo.discount as num).toDouble();
+        }
+        _discountAmount = _discountAmount > _originalPrice
+          ? _originalPrice
+          : _discountAmount;
+        _totalPrice = _originalPrice - _discountAmount;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Promo $promoCode berhasil diterapkan!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      setState(() {
+        _appliedPromoCode = null;
+        _discountAmount = 0;
+        _totalPrice = _originalPrice;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kode promo tidak valid'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -135,6 +199,17 @@ class _BookingScreenState extends State<BookingScreen> {
       appBar: AppBar(
         title: const Text('Konfirmasi Booking'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.local_offer),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PromoScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -182,9 +257,9 @@ class _BookingScreenState extends State<BookingScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Total Harga: Rp ${NumberFormat('#,###').format(_totalPrice)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                            color: Colors.blue[400],
                           ),
                         ),
                       ],
@@ -317,13 +392,127 @@ class _BookingScreenState extends State<BookingScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Kode Promo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _promoCodeController,
+                        decoration: InputDecoration(
+                          labelText: 'Masukkan Kode Promo',
+                          labelStyle: const TextStyle(color: Colors.black),
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                          ),
+                          suffixIcon: _appliedPromoCode != null
+                            ?  Icon(Icons.check_circle, color: Colors.blue[400])
+                            : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _applyPromoCode,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 5,
+                      ),
+                      child: const Text(
+                        'Terapkan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_appliedPromoCode != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Promo $_appliedPromoCode diterapkan',
+                    style:  TextStyle(
+                      color: Colors.blue[400],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Harga Awal'),
+                            Text('Rp ${NumberFormat('#,###').format(_originalPrice)}'),
+                          ],
+                        ),
+                        if (_discountAmount > 0) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Diskon',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              Text(
+                                '- Rp ${NumberFormat('#,###').format(_discountAmount)}',
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const Divider(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Harga',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[400],
+                              ),
+                            ),
+                            Text(
+                              'Rp ${NumberFormat('#,###').format(_totalPrice)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[400],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _submitBooking,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.blueAccent,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -353,6 +542,7 @@ class _BookingScreenState extends State<BookingScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
+    _promoCodeController.dispose();
     super.dispose();
   }
 }

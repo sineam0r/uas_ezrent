@@ -35,16 +35,16 @@ class ConfirmationScreen extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.check_circle,
-                    color: Colors.green,
+                    color: Colors.blueAccent,
                     size: 100,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Booking Berhasil!',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: Colors.blue[400],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -60,10 +60,10 @@ class ConfirmationScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Total Harga: Rp ${NumberFormat('#,###').format(totalPrice)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Colors.blue[400],
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -80,7 +80,7 @@ class ConfirmationScreen extends StatelessWidget {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.blueAccent,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,
