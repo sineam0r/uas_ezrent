@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uas_ezrent/models/user.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/models/booking.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
+import 'package:uas_ezrent/services/profile_service.dart';
 import 'package:uas_ezrent/screens/confirmation_screen.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class BookingScreen extends StatefulWidget {
 class _BookingScreenState extends State<BookingScreen> {
   final _formKey = GlobalKey<FormState>();
   final BookingService _bookingService = BookingService();
+  final ProfileService _profileService = ProfileService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -42,6 +45,8 @@ class _BookingScreenState extends State<BookingScreen> {
   late DateTime _startDate;
   late DateTime _endDate;
   late double _totalPrice;
+  UserModel? _currentUser;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -49,6 +54,30 @@ class _BookingScreenState extends State<BookingScreen> {
     _startDate = widget.startDate;
     _endDate = widget.endDate;
     _totalPrice = widget.vehicle.pricePerDay * widget.rentalDuration;
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final user = await _profileService.getCurrentUserProfile();
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _nameController.text = user.name;
+          _phoneController.text = user.phoneNumber;
+          _emailController.text = user.email;
+          _addressController.text = user.address ?? '';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memuat profil: $e')),
+      );
+    }
   }
 
   void _submitBooking() async {
@@ -56,7 +85,7 @@ class _BookingScreenState extends State<BookingScreen> {
       try {
         final booking = BookingModel(
           id: '',
-          userId: '',
+          userId: _currentUser?.id ?? '',
           vehicleId: widget.vehicle.id,
           vehicleName: widget.vehicle.name,
           vehicleBrand: widget.vehicle.brand,
@@ -65,6 +94,7 @@ class _BookingScreenState extends State<BookingScreen> {
           rentalDuration: widget.rentalDuration,
           totalPrice: _totalPrice,
           paymentMethod: _selectedPaymentMethod!,
+          createdAt: DateTime.now(),
         );
 
         final bookingId = await _bookingService.addBooking(booking);
@@ -90,6 +120,17 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Konfirmasi Booking'),
+          centerTitle: true,
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Konfirmasi Booking'),
@@ -163,7 +204,11 @@ class _BookingScreenState extends State<BookingScreen> {
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Nama Lengkap',
+                    labelStyle: TextStyle(color: Colors.black),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -177,7 +222,11 @@ class _BookingScreenState extends State<BookingScreen> {
                   controller: _phoneController,
                   decoration: const InputDecoration(
                     labelText: 'Nomor Telepon',
+                    labelStyle: TextStyle(color: Colors.black),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -195,7 +244,11 @@ class _BookingScreenState extends State<BookingScreen> {
                   controller: _emailController,
                   decoration: const InputDecoration(
                     labelText: 'Email',
+                    labelStyle: TextStyle(color: Colors.black),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -213,7 +266,11 @@ class _BookingScreenState extends State<BookingScreen> {
                   controller: _addressController,
                   decoration: const InputDecoration(
                     labelText: 'Alamat',
+                    labelStyle: TextStyle(color: Colors.black),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   maxLines: 3,
                   validator: (value) {
@@ -235,7 +292,11 @@ class _BookingScreenState extends State<BookingScreen> {
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Pilih Metode Pembayaran',
+                    labelStyle: TextStyle(color: Colors.black),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   value: _selectedPaymentMethod,
                   items: _paymentMethods

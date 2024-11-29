@@ -17,6 +17,7 @@ class HistoryScreen extends StatelessWidget {
 
     if (currentUser == null) {
       return Scaffold(
+        backgroundColor: Colors.grey[100],
         appBar: AppBar(
           title: const Text('Riwayat Rentalku'),
         ),
@@ -25,6 +26,7 @@ class HistoryScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Riwayat Rental'),
       ),

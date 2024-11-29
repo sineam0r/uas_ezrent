@@ -12,6 +12,7 @@ class BookingModel {
   final double totalPrice;
   final String paymentMethod;
   final String status;
+  final DateTime createdAt;
 
   BookingModel({
     required this.id,
@@ -25,7 +26,8 @@ class BookingModel {
     required this.totalPrice,
     required this.paymentMethod,
     this.status = 'pending',
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory BookingModel.fromMap(Map<String, dynamic> map, String documentId) {
     return BookingModel(
@@ -40,6 +42,7 @@ class BookingModel {
       totalPrice: map['totalPrice'],
       paymentMethod: map['paymentMethod'],
       status: map['status'] ?? 'pending',
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
     );
   }
 
@@ -55,6 +58,7 @@ class BookingModel {
       'totalPrice': totalPrice,
       'paymentMethod': paymentMethod,
       'status': status,
+      'createdAt': FieldValue.serverTimestamp(),
     };
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uas_ezrent/models/booking.dart';
@@ -15,14 +17,32 @@ class BookingService {
 
       final bookingData = booking.toMap();
       bookingData['userId'] = currentUser.uid;
+      bookingData['status'] = 'pending';
 
       final docRef = await _firestore.collection('bookings').add(bookingData);
+
+      _delayedStatusUpdate(docRef.id);
+
       return docRef.id;
     } catch (e) {
       print('Error adding booking: $e');
       rethrow;
     }
   }
+
+  void _delayedStatusUpdate(String bookingId) {
+    Future.delayed(Duration(seconds: Random().nextInt(11) + 5), () async {
+      try {
+        final bookingDoc = await _firestore.collection('bookings').doc(bookingId).get();
+        if (bookingDoc.exists && bookingDoc.data()?['status'] == 'pending') {
+          await updateBookingStatus(bookingId, 'confirmed');
+        }
+      } catch (e) {
+        print('Error in delayed status update: $e');
+      }
+    });
+  }
+
 
   Stream<List<BookingModel>> getUserBookings() {
     final currentUser = _auth.currentUser;
@@ -33,7 +53,7 @@ class BookingService {
     return _firestore
         .collection('bookings')
         .where('userId', isEqualTo: currentUser.uid)
-        .orderBy('startDate', descending: true)
+        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
