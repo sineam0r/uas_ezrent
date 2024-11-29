@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uas_ezrent/models/user.dart';
+import 'package:uas_ezrent/screens/auth/login_screen.dart';
 import 'package:uas_ezrent/services/auth_service.dart';
 import 'package:uas_ezrent/services/profile_service.dart';
 
@@ -8,7 +9,7 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -87,7 +88,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout() {
     _authService.signOut();
-    Navigator.of(context).pushReplacementNamed('/login');
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
   }
 
   @override

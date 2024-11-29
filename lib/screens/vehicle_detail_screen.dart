@@ -263,6 +263,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       bottomNavigationBar: VehicleBookingButton(
         vehicle: widget.vehicle,
         selectedRentalDuration: _rentalDuration,
+        startDate: _startDate,
+        endDate: _endDate,
       ),
     );
   }

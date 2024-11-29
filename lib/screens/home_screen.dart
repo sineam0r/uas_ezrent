@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/favorite_screen.dart';
+import 'package:uas_ezrent/screens/history_screen.dart';
 import 'package:uas_ezrent/screens/profile_screen.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
 import 'package:uas_ezrent/widgets/home/category_filter.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _screens = [
       _buildBody(),
       const FavoriteScreen(),
+      HistoryScreen(),
     ];
   }
 

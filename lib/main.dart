@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:uas_ezrent/screens/auth/login_screen.dart';
-import 'package:uas_ezrent/screens/home_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {

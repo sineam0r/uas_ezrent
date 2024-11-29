@@ -5,12 +5,16 @@ import 'package:uas_ezrent/screens/booking_screen.dart';
 class VehicleBookingButton extends StatelessWidget {
   final VehicleModel vehicle;
   final int selectedRentalDuration;
+  final DateTime? startDate;
+  final DateTime? endDate;
   final VoidCallback? onBooking;
 
   const VehicleBookingButton({
     super.key,
     required this.vehicle,
     required this.selectedRentalDuration,
+    this.startDate,
+    this.endDate,
     this.onBooking,
   });
 
@@ -24,7 +28,7 @@ class VehicleBookingButton extends StatelessWidget {
                 if (onBooking != null) {
                   onBooking!();
                 } else {
-                  if (selectedRentalDuration == 0) {
+                  if (selectedRentalDuration == 0 || startDate == null || endDate == null) {
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -51,6 +55,8 @@ class VehicleBookingButton extends StatelessWidget {
                         builder: (context) => BookingScreen(
                           vehicle: vehicle,
                           rentalDuration: selectedRentalDuration,
+                          startDate: startDate!,
+                          endDate: endDate!,
                         ),
                       ),
                     );

@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
+import 'package:uas_ezrent/models/booking.dart';
+import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/screens/confirmation_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final VehicleModel vehicle;
   final int rentalDuration;
+  final DateTime startDate;
+  final DateTime endDate;
 
   const BookingScreen({
     super.key,
     required this.vehicle,
-    required this.rentalDuration
+    required this.rentalDuration,
+    required this.startDate,
+    required this.endDate,
   });
 
   @override
@@ -19,6 +25,7 @@ class BookingScreen extends StatefulWidget {
 
 class _BookingScreenState extends State<BookingScreen> {
   final _formKey = GlobalKey<FormState>();
+  final BookingService _bookingService = BookingService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -39,25 +46,47 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   void initState() {
     super.initState();
-    _startDate = DateTime.now();
-    _endDate = _startDate.add(Duration(days: widget.rentalDuration - 1));
+    _startDate = widget.startDate;
+    _endDate = widget.endDate;
     _totalPrice = widget.vehicle.pricePerDay * widget.rentalDuration;
   }
 
-  void _submitBooking() {
-  if (_formKey.currentState!.validate()) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ConfirmationScreen(
-          vehicleDetails: '${widget.vehicle.brand} ${widget.vehicle.name}',
+  void _submitBooking() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final booking = BookingModel(
+          id: '',
+          userId: '',
+          vehicleId: widget.vehicle.id,
+          vehicleName: widget.vehicle.name,
+          vehicleBrand: widget.vehicle.brand,
+          startDate: _startDate,
+          endDate: _endDate,
           rentalDuration: widget.rentalDuration,
           totalPrice: _totalPrice,
-        ),
-      ),
-    );
+          paymentMethod: _selectedPaymentMethod!,
+        );
+
+        final bookingId = await _bookingService.addBooking(booking);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConfirmationScreen(
+              vehicleDetails: '${widget.vehicle.brand} ${widget.vehicle.name}',
+              rentalDuration: widget.rentalDuration,
+              totalPrice: _totalPrice,
+              bookingId: bookingId,
+            ),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal membuat booking: $e')),
+        );
+      }
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -266,4 +295,3 @@ class _BookingScreenState extends State<BookingScreen> {
     super.dispose();
   }
 }
-
