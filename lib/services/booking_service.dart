@@ -3,16 +3,18 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uas_ezrent/models/booking.dart';
+import 'package:uas_ezrent/services/notification_service.dart';
 
 class BookingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final NotificationService _notificationService = NotificationService();
 
   Future<String> addBooking(BookingModel booking) async {
     try {
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
-        throw Exception('User not logged in');
+        throw Exception('Pengguna tidak terautentikasi.');
       }
 
       final bookingData = booking.toMap();
@@ -20,6 +22,13 @@ class BookingService {
       bookingData['status'] = 'pending';
 
       final docRef = await _firestore.collection('bookings').add(bookingData);
+
+      await _notificationService.addNotification(
+        title: 'Booking Berhasil',
+        message: 'Anda berhasil membooking ${booking.vehicleName}',
+        bookingId: docRef.id,
+        type: 'booking_created',
+      );
 
       _delayedStatusUpdate(docRef.id);
 
@@ -42,7 +51,6 @@ class BookingService {
       }
     });
   }
-
 
   Stream<List<BookingModel>> getUserBookings() {
     final currentUser = _auth.currentUser;
@@ -70,6 +78,14 @@ class BookingService {
       await _firestore.collection('bookings').doc(bookingId).update({
         'status': status,
       });
+
+      await _notificationService.addNotification(
+        title: 'Status Booking Diperbarui',
+        message: 'Status booking Anda telah diubah menjadi $status',
+        bookingId: bookingId,
+        type: 'booking_status_update',
+      );
+
     } catch (e) {
       print('Error updating booking status: $e');
       rethrow;
@@ -78,7 +94,19 @@ class BookingService {
 
   Future<void> deleteBooking(String bookingId) async {
     try {
+      final bookingDoc = await _firestore.collection('bookings').doc(bookingId).get();
+      final bookingData = bookingDoc.data();
+
       await _firestore.collection('bookings').doc(bookingId).delete();
+
+      if (bookingData != null) {
+        await _notificationService.addNotification(
+          title: 'Booking Dihapus',
+          message: 'Booking ${bookingData['vehicleName']} telah dihapus',
+          bookingId: bookingId,
+          type: 'booking_deleted',
+        );
+      }
     } catch (e) {
       print('Error deleting booking: $e');
       rethrow;

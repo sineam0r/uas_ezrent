@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/favorite_screen.dart';
 import 'package:uas_ezrent/screens/history_screen.dart';
+import 'package:uas_ezrent/screens/notification_screen.dart';
 import 'package:uas_ezrent/screens/profile_screen.dart';
 import 'package:uas_ezrent/screens/promo_screen.dart';
 import 'package:uas_ezrent/screens/search_screen.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
 import 'package:uas_ezrent/widgets/home/vehicle_card.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
+import 'package:uas_ezrent/services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,8 +21,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<VehicleModel> _displayedVehicles = [];
   int _currentIndex = 0;
+  bool _hasUnreadNotifications = false;
 
   late List<Widget> _screens;
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -32,6 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
       const FavoriteScreen(),
       HistoryScreen(),
     ];
+
+    _notificationService.getUserNotifications().listen((notifications) {
+      setState(() {
+        _hasUnreadNotifications = notifications.any((notification) =>
+          notification.isRead == false);
+      });
+    });
   }
 
   Widget _buildBody() {
@@ -96,11 +107,32 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Colors.blue,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // notifikasi
-            },
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NotificationScreen()),
+                  );
+                },
+              ),
+              if (_hasUnreadNotifications)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.search),
