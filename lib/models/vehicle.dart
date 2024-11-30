@@ -21,6 +21,20 @@ class VehicleModel {
     required this.isAvailable,
   });
 
+  String get category {
+    switch (type.toLowerCase()) {
+      case 'car':
+        return 'Mobil';
+      case 'motorcycle':
+        return 'Motor';
+      case 'bicycle':
+        return 'Sepeda';
+      default:
+        print('Kategori tidak dikenal: $type');
+        return 'Lainnya';
+    }
+  }
+
   factory VehicleModel.fromFirestore(Map<String, dynamic> firestore) {
     return VehicleModel(
       id: firestore['id'],
@@ -34,6 +48,8 @@ class VehicleModel {
       isAvailable: firestore['isAvailable'],
     );
   }
+
+  get price => null;
 
   Map<String, dynamic> toFirestore() {
     return {

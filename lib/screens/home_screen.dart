@@ -4,8 +4,8 @@ import 'package:uas_ezrent/screens/favorite_screen.dart';
 import 'package:uas_ezrent/screens/history_screen.dart';
 import 'package:uas_ezrent/screens/profile_screen.dart';
 import 'package:uas_ezrent/screens/promo_screen.dart';
+import 'package:uas_ezrent/screens/search_screen.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
-import 'package:uas_ezrent/widgets/home/category_filter.dart';
 import 'package:uas_ezrent/widgets/home/vehicle_card.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
 
@@ -17,14 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> categories = [
-    'Semua',
-    'Mobil',
-    'Motor',
-    'Sepeda',
-  ];
-
-  String _selectedCategory = 'Semua';
   List<VehicleModel> _displayedVehicles = [];
   int _currentIndex = 0;
 
@@ -50,73 +42,41 @@ class _HomeScreenState extends State<HomeScreen> {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Kategori Kendaraan',
+              'Kendaraan Populer',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          CategoryFilter(
-            categories: categories,
-            selectedCategory: _selectedCategory,
-            onCategorySelected: (category) {
-              setState(() {
-                _selectedCategory = category;
-                _displayedVehicles = DummyVehicles.getVehiclesByCategory(category);
-              });
-            },
-          ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Kendaraan Populer',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // vehicle screen
-                  },
-                  child: Text(
-                    'Lihat Semua',
-                    style: TextStyle(color: Colors.blue[900]),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: _displayedVehicles.length,
-            itemBuilder: (context, index) {
-              return VehicleCard(
-                vehicle: _displayedVehicles[index],
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VehicleDetailScreen(
-                        vehicle: _displayedVehicles[index],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.7,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: _displayedVehicles.length,
+              itemBuilder: (context, index) {
+                return VehicleCard(
+                  vehicle: _displayedVehicles[index],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VehicleDetailScreen(
+                          vehicle: _displayedVehicles[index],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -145,7 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // search
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
+              );
             },
           ),
         ],
