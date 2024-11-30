@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
@@ -39,16 +40,24 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           .delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kendaraan dihapus dari favorit'),
+        SnackBar(
+          content: Text(
+            'Kendaraan dihapus dari favorit',
+            style: GoogleFonts.poppins(),
+          ),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blueAccent,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal menghapus dari favorit'),
+        SnackBar(
+          content: Text(
+            'Gagal menghapus dari favorit',
+            style: GoogleFonts.poppins(),
+          ),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -60,16 +69,33 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
     if (currentUser == null) {
       return Scaffold(
+        backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          title: const Text('Kendaraan Favoritku'),
+          title: Text(
+            'Kendaraan Favoritku',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.blueAccent,
+          elevation: 0,
         ),
         body: const FavoriteEmptyState(isLoggedIn: false),
       );
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Kendaraan Favoritku'),
+        title: Text(
+          'Kendaraan Favoritku',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
@@ -82,6 +108,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         ],
       ),
       body: RefreshIndicator(
+        backgroundColor: Colors.white,
+        color: Colors.blueAccent,
         onRefresh: () async {
           setState(() {});
         },

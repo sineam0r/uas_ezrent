@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
 import 'package:uas_ezrent/data/dummy_vehicles.dart';
@@ -98,20 +99,27 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   Text(
                     'Filter Lanjutan',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
                     value: _selectedCategory,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Kategori',
-                      border: OutlineInputBorder(),
+                      labelStyle: GoogleFonts.poppins(),
+                      border: const OutlineInputBorder(),
                     ),
                     items: _categories.map((category) {
                       return DropdownMenuItem(
                         value: category,
-                        child: Text(category),
+                        child: Text(
+                          category,
+                          style: GoogleFonts.poppins(),
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -123,14 +131,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
                     value: _selectedTransmission,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Transmisi',
-                      border: OutlineInputBorder(),
+                      labelStyle: GoogleFonts.poppins(),
+                      border: const OutlineInputBorder(),
                     ),
                     items: _transmissionTypes.map((transmission) {
                       return DropdownMenuItem(
                         value: transmission,
-                        child: Text(transmission),
+                        child: Text(
+                          transmission,
+                          style: GoogleFonts.poppins(),
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -145,9 +157,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       Expanded(
                         child: TextField(
                           controller: _minPriceController,
-                          decoration: const InputDecoration(
+                          style: GoogleFonts.poppins(),
+                          decoration: InputDecoration(
                             labelText: 'Harga Min',
-                            border: OutlineInputBorder(),
+                            labelStyle: GoogleFonts.poppins(),
+                            border: const OutlineInputBorder(),
                             prefixText: 'Rp ',
                           ),
                           keyboardType: TextInputType.number,
@@ -157,9 +171,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       Expanded(
                         child: TextField(
                           controller: _maxPriceController,
-                          decoration: const InputDecoration(
+                          style: GoogleFonts.poppins(),
+                          decoration: InputDecoration(
                             labelText: 'Harga Max',
-                            border: OutlineInputBorder(),
+                            labelStyle: GoogleFonts.poppins(),
+                            border: const OutlineInputBorder(),
                             prefixText: 'Rp ',
                           ),
                           keyboardType: TextInputType.number,
@@ -169,13 +185,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(height: 15),
                   SwitchListTile(
-                    title: const Text('Hanya Kendaraan Tersedia'),
+                    title: Text(
+                      'Hanya Kendaraan Tersedia',
+                      style: GoogleFonts.poppins(),
+                    ),
                     value: _isAvailableOnly,
                     onChanged: (bool value) {
                       setModalState(() {
                         _isAvailableOnly = value;
                       });
                     },
+                    activeColor: Colors.blueAccent,
                   ),
                   const SizedBox(height: 20),
                   TextButton(
@@ -183,15 +203,24 @@ class _SearchScreenState extends State<SearchScreen> {
                       _resetFilters();
                       Navigator.pop(context);
                     },
-                    child: const Text('Reset Filter'),
+                    child: Text(
+                      'Reset Filter',
+                      style: GoogleFonts.poppins(color: Colors.blueAccent),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                    ),
                     onPressed: () {
                       _applyFilters();
                       Navigator.pop(context);
                     },
-                    child: const Text('Terapkan Filter'),
+                    child: Text(
+                      'Terapkan Filter',
+                      style: GoogleFonts.poppins(color: Colors.white),
+                    ),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -203,35 +232,18 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _minPriceController.dispose();
-    _maxPriceController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cari Kendaraan'),
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: _showFilterBottomSheet,
-          ),
-        ],
-      ),
-      body: Column(
+  Widget _buildSearchContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Cari kendaraan...',
+                labelText: 'Cari Kendaraan',
+                labelStyle: GoogleFonts.poppins(color: Colors.grey[700]),
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -243,7 +255,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     )
                   : null,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.blueAccent),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
                 ),
               ),
               onChanged: (value) {
@@ -251,16 +272,21 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _filteredVehicles.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
                     'Tidak ada kendaraan ditemukan',
-                    style: TextStyle(fontSize: 18),
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
                   ),
                 )
               : GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.7,
@@ -287,6 +313,40 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _minPriceController.dispose();
+    _maxPriceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Text(
+          'Cari Kendaraan',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _showFilterBottomSheet,
+          ),
+        ],
+      ),
+      body: _buildSearchContent(),
     );
   }
 }

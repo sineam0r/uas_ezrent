@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/favorite_screen.dart';
 import 'package:uas_ezrent/screens/history_screen.dart';
@@ -50,13 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Text(
               'Kendaraan Populer',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
           ),
@@ -97,15 +99,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'EZRent',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: 20,
           ),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
         actions: [
           Stack(
             alignment: Alignment.topRight,
@@ -149,23 +154,25 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            Container(
-              height: 80,
-              color: Colors.blue,
-              child: const Padding(
-                padding: EdgeInsets.only(left: 16.0, top: 32.0),
-                child: Text(
-                  'Menu',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blueAccent,
+              ),
+              child: Text(
+                'Menu',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profil'),
+              leading: const Icon(Icons.person, color: Colors.blueAccent),
+              title: Text(
+                'Profil',
+                style: GoogleFonts.poppins(),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -175,8 +182,11 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.local_offer),
-              title: const Text('Promo'),
+              leading: const Icon(Icons.local_offer, color: Colors.blueAccent),
+              title: Text(
+                'Promo',
+                style: GoogleFonts.poppins(),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -190,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
@@ -205,7 +216,12 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Riwayat',
           ),
         ],
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
+        selectedLabelStyle: GoogleFonts.poppins(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: GoogleFonts.poppins(),
         onTap: (index) {
           setState(() {
             _currentIndex = index;

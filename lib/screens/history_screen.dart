@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/booking.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/screens/booking_detail_screen.dart';
@@ -11,6 +12,41 @@ class HistoryScreen extends StatelessWidget {
 
   HistoryScreen({super.key});
 
+  Widget _buildHistoryContent(BuildContext context, List<BookingModel> bookings) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: bookings.length,
+              itemBuilder: (context, index) {
+                final booking = bookings[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: HistoryListItem(
+                    booking: booking,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BookingDetailScreen(booking: booking),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -19,7 +55,15 @@ class HistoryScreen extends StatelessWidget {
       return Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          title: const Text('Riwayat Rentalku'),
+          title: Text(
+            'Riwayat Rentalku',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              fontSize: 20,
+            ),
+          ),
+          elevation: 0,
         ),
         body: const HistoryEmptyState(isLoggedIn: false),
       );
@@ -28,7 +72,15 @@ class HistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Riwayat Rental'),
+        title: Text(
+          'Riwayat Rentalku',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
+        elevation: 0,
       ),
       body: StreamBuilder<List<BookingModel>>(
         stream: _bookingService.getUserBookings(),
@@ -36,25 +88,7 @@ class HistoryScreen extends StatelessWidget {
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const HistoryEmptyState(isLoggedIn: true);
           }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final booking = snapshot.data![index];
-              return HistoryListItem(
-                booking: booking,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookingDetailScreen(booking: booking),
-                    ),
-                  );
-                },
-              );
-            },
-          );
+          return _buildHistoryContent(context, snapshot.data!);
         },
       ),
     );

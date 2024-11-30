@@ -1,43 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uas_ezrent/screens/auth/register_screen.dart';
-import 'package:uas_ezrent/screens/auth/reset_password_screen.dart';
-import 'package:uas_ezrent/screens/home_screen.dart';
+import 'package:uas_ezrent/screens/auth/login_screen.dart';
 import 'package:uas_ezrent/services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
-
   bool _isLoading = false;
-  bool _showPassword = false;
 
-  Future<void> _login() async {
+  Future<void> _resetPassword() async {
+    if (_emailController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Mohon masukkan email')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
-    final result = await _authService.login(
-      context: context,
+    final result = await _authService.resetPassword(
       email: _emailController.text,
-      password: _passwordController.text
     );
 
     if (result['success']) {
-      Navigator.pushAndRemoveUntil(
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'])),
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: Colors.red,
+        ),
       );
     }
 
@@ -54,6 +63,17 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 1),
                 Column(
                   children: [
@@ -86,12 +106,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Center(
                           child: Text(
-                            'Login',
+                            'Reset Password',
                             style: GoogleFonts.poppins(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Masukkan email Anda untuk menerima link reset password',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
                         TextField(
@@ -115,60 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                         ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: GoogleFonts.poppins(color: Colors.grey[700]),
-                            prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.blueAccent),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _showPassword ? Icons.visibility_off : Icons.visibility,
-                                color: Colors.grey[600],
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _showPassword = !_showPassword;
-                                });
-                              },
-                            ),
-                          ),
-                          obscureText: !_showPassword,
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            child: Text(
-                              'Reset Password',
-                              style: GoogleFonts.poppins(
-                                color: Colors.blue[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 24),
                         _isLoading
                             ? const Center(
@@ -178,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               )
                             : ElevatedButton(
-                                onPressed: _login,
+                                onPressed: _resetPassword,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blueAccent,
                                   minimumSize: const Size(double.infinity, 52),
@@ -188,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   elevation: 2,
                                 ),
                                 child: Text(
-                                  'Login',
+                                  'Kirim Link Reset',
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -196,33 +171,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                    );
-                  },
-                  child: Text.rich(
-                    TextSpan(
-                      text: 'Belum punya akun? ',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Daftar',
-                          style: GoogleFonts.poppins(
-                            color: Colors.blue[700],
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                       ],
                     ),
                   ),
