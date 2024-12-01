@@ -45,10 +45,7 @@ class NotificationService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) =>
-          snapshot.docs.map((doc) =>
-            NotificationModel.fromFirestore(doc)
-          ).toList()
-        );
+            snapshot.docs.map((doc) => NotificationModel.fromFirestore(doc)).toList());
   }
 
   Future<void> markNotificationAsRead(String notificationId) async {
@@ -61,5 +58,17 @@ class NotificationService {
         .collection('notifications')
         .doc(notificationId)
         .update({'isRead': true});
+  }
+
+  Future<void> deleteNotification(String notificationId) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return;
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
   }
 }

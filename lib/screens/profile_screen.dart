@@ -111,22 +111,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         title: Text(
-          'Profil Saya',
+          'Profilku',
           style: GoogleFonts.poppins(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.blueAccent),
+            icon: const Icon(Icons.logout, color: Colors.black,),
             onPressed: _logout,
           )
         ],
-        iconTheme: const IconThemeData(color: Colors.blueAccent),
       ),
       body: _isLoading
           ? const Center(
@@ -226,14 +226,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Center(
                         child: Text(
                           'Email: ${_currentUser?.email ?? ""}',
-                          style: GoogleFonts.poppins(),
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       Center(
                         child: Text(
                           'Bergabung sejak: ${_currentUser?.createdAt == null ? "" : DateFormat("dd MMMM yyyy").format(_currentUser!.createdAt)}',
-                          style: GoogleFonts.poppins(),
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),

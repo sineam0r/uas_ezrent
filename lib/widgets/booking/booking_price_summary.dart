@@ -28,7 +28,7 @@ class BookingPriceSummary extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Harga Awal',
+                  'Harga',
                   style: GoogleFonts.poppins(),
                 ),
                 Text(

@@ -18,15 +18,19 @@ class ConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Konfirmasi Booking'),
+        title: const Text('Konfirmasi Booking', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
             elevation: 4,
+            color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(

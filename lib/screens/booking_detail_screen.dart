@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/booking.dart';
 import 'package:uas_ezrent/widgets/bdetail/rental_detail_card.dart';
 import 'package:uas_ezrent/widgets/bdetail/cancel_booking_button.dart';
@@ -17,13 +18,20 @@ class BookingDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Detail Rental',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
         ),
-        centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blueAccent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -31,12 +39,29 @@ class BookingDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                'Informasi Kendaraan',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
+              const SizedBox(height: 16),
               VehicleInfoCard(booking: booking),
+              const SizedBox(height: 24),
+              Text(
+                'Detail Penyewaan',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
               const SizedBox(height: 16),
               RentalDetailsCard(booking: booking),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               if (booking.status == 'pending')
                 CancelBookingButton(booking: booking),
+              const SizedBox(height: 16),
             ],
           ),
         ),

@@ -1,50 +1,64 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/booking.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/screens/booking_detail_screen.dart';
+import 'package:uas_ezrent/widgets/history/history_content.dart';
 import 'package:uas_ezrent/widgets/history/history_empty_state.dart';
-import 'package:uas_ezrent/widgets/history/history_list_item.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
+
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
   final BookingService _bookingService = BookingService();
+  late StreamSubscription<List<BookingModel>> _bookingsSubscription;
+  List<BookingModel>? _bookings;
+  bool _isLoading = true;
+  String? _errorMessage;
 
-  HistoryScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookings();
+  }
 
-  Widget _buildHistoryContent(BuildContext context, List<BookingModel> bookings) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: bookings.length,
-              itemBuilder: (context, index) {
-                final booking = bookings[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: HistoryListItem(
-                    booking: booking,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BookingDetailScreen(booking: booking),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _bookingsSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchBookings() async {
+    try {
+      _bookingsSubscription = _bookingService.getUserBookings().listen(
+        (bookings) {
+          setState(() {
+            _bookings = bookings;
+            _isLoading = false;
+            _errorMessage = null;
+          });
+        },
+        onError: (error) {
+          setState(() {
+            _bookings = null;
+            _isLoading = false;
+            _errorMessage = 'Error loading bookings: $error';
+          });
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _bookings = null;
+        _isLoading = false;
+        _errorMessage = 'Error loading bookings: $e';
+      });
+    }
   }
 
   @override
@@ -78,14 +92,35 @@ class HistoryScreen extends StatelessWidget {
         ),
         elevation: 0,
       ),
-      body: StreamBuilder<List<BookingModel>>(
-        stream: _bookingService.getUserBookings(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const HistoryEmptyState(isLoggedIn: true);
-          }
-          return _buildHistoryContent(context, snapshot.data!);
-        },
+      body: SafeArea(
+        child: HistoryContent(
+          isLoading: _isLoading,
+          errorMessage: _errorMessage,
+          bookings: _bookings,
+          onDelete: (booking) async {
+            try {
+              await _bookingService.deleteBooking(booking.id);
+              setState(() {
+                _bookings!.remove(booking);
+              });
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error deleting booking: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          onBookingTap: (booking) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BookingDetailScreen(booking: booking),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

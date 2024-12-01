@@ -209,6 +209,7 @@ class _BookingScreenState extends State<BookingScreen> {
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
               color: Colors.white,
+              fontSize: 20,
             ),
           ),
         ),
@@ -231,6 +232,7 @@ class _BookingScreenState extends State<BookingScreen> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: 20,
           ),
         ),
         actions: [
@@ -357,7 +359,7 @@ class _BookingScreenState extends State<BookingScreen> {
                             prefixIcon: const Icon(Icons.payment, color: Colors.blueAccent),
                             hintText: 'Pilih metode pembayaran',
                             hintStyle: GoogleFonts.poppins(
-                              color: Colors.grey[400],
+                              color: Colors.grey[600],
                               fontSize: 14,
                             ),
                             alignLabelWithHint: true,

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -94,10 +96,15 @@ class BookingService {
 
   Future<void> deleteBooking(String bookingId) async {
     try {
+      print('Attempting to delete booking: $bookingId');
+
       final bookingDoc = await _firestore.collection('bookings').doc(bookingId).get();
       final bookingData = bookingDoc.data();
 
+      print('Booking data: $bookingData');
+
       await _firestore.collection('bookings').doc(bookingId).delete();
+      print('Booking deleted successfully');
 
       if (bookingData != null) {
         await _notificationService.addNotification(
