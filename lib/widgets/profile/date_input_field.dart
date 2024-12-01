@@ -11,7 +11,7 @@ class DateInputField extends StatelessWidget {
     super.key,
     required this.context,
     this.selectedDate,
-    required this.onDateSelected, required InputDecoration decoration,
+    required this.onDateSelected,
   });
 
   Future<void> _selectBirthDate() async {
@@ -20,6 +20,17 @@ class DateInputField extends StatelessWidget {
       initialDate: selectedDate ?? DateTime(2000),
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.blueAccent,
+            hintColor: Colors.blueAccent,
+            colorScheme: const ColorScheme.light(primary: Colors.blueAccent),
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
@@ -43,6 +54,10 @@ class DateInputField extends StatelessWidget {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
           ),
         ),
         child: Text(

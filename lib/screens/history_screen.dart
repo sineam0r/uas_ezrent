@@ -59,8 +59,6 @@ class HistoryScreen extends StatelessWidget {
             'Riwayat Rentalku',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
-              color: Colors.black,
-              fontSize: 20,
             ),
           ),
           elevation: 0,
@@ -76,8 +74,6 @@ class HistoryScreen extends StatelessWidget {
           'Riwayat Rentalku',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 20,
           ),
         ),
         elevation: 0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/vehicle_detail_screen.dart';
@@ -19,8 +20,13 @@ class FavoriteListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: InkWell(
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           Navigator.push(
             context,
@@ -29,38 +35,50 @@ class FavoriteListCard extends StatelessWidget {
             ),
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  vehicle.imageUrl,
-                  width: 100,
-                  height: 100,
+        child: Row(
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                image: DecorationImage(
+                  image: AssetImage(vehicle.imageUrl),
                   fit: BoxFit.cover,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       '${vehicle.brand} ${vehicle.name}',
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Rp ${vehicle.pricePerDay}',
-                      style: TextStyle(
+                      'Rp ${vehicle.pricePerDay.toStringAsFixed(0)}/hari',
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.blue[700],
-                        fontWeight: FontWeight.w500,
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -74,7 +92,7 @@ class FavoriteListCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${vehicle.year} · ${vehicle.transmission}',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: Colors.grey[600],
                           ),
@@ -84,13 +102,12 @@ class FavoriteListCard extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.favorite),
-                color: Colors.red,
-                onPressed: () => onRemove(favorite.id),
-              ),
-            ],
-          ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.favorite, color: Colors.red),
+              onPressed: () => onRemove(favorite.id),
+            ),
+          ],
         ),
       ),
     );

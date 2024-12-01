@@ -65,7 +65,7 @@ class VehicleBookingButton extends StatelessWidget {
               }
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.blueAccent,
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

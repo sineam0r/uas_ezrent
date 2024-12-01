@@ -232,7 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       Center(
                         child: Text(
-                          'Bergabung sejak: ${_currentUser?.createdAt == null ? "" : DateFormat("dd MMMM yyyy").format(_currentUser!.createdAt!)}',
+                          'Bergabung sejak: ${_currentUser?.createdAt == null ? "" : DateFormat("dd MMMM yyyy").format(_currentUser!.createdAt)}',
                           style: GoogleFonts.poppins(),
                           textAlign: TextAlign.center,
                         ),
@@ -245,3 +245,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

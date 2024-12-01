@@ -18,7 +18,7 @@ class VehicleInfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blue),
+          Icon(icon, color: Colors.blueAccent),
           const SizedBox(width: 16),
           Text(
             label,

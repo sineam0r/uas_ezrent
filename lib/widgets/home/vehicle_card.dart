@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 
 class VehicleCard extends StatelessWidget {
@@ -16,32 +17,37 @@ class VehicleCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        elevation: 3,
+        elevation: 4,
+        shadowColor: Colors.black26,
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15),
+              ),
               child: Image.asset(
                 vehicle.imageUrl,
-                height: 150,
+                height: 160,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    vehicle.name,
-                    style: const TextStyle(
+                    '${vehicle.brand} ${vehicle.name}',
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -49,8 +55,8 @@ class VehicleCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'Rp ${vehicle.pricePerDay.toStringAsFixed(0)}/hari',
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: GoogleFonts.poppins(
+                      color: Colors.blueAccent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -58,19 +64,24 @@ class VehicleCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        vehicle.type,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        vehicle.year.toString(),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
+                      Row(
+                        children: [
+                          Icon(
+                            vehicle.type == 'Mobil'
+                              ? Icons.directions_car
+                              : Icons.motorcycle,
+                            size: 16,
+                            color: Colors.grey[600],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${vehicle.year} · ${vehicle.transmission}',
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

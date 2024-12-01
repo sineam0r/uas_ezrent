@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/promo.dart';
 import 'package:uas_ezrent/models/user.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
@@ -8,6 +8,10 @@ import 'package:uas_ezrent/screens/promo_screen.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/services/profile_service.dart';
 import 'package:uas_ezrent/screens/confirmation_screen.dart';
+import 'package:uas_ezrent/widgets/booking/booking_form_section.dart';
+import 'package:uas_ezrent/widgets/booking/booking_input_field.dart';
+import 'package:uas_ezrent/widgets/booking/booking_price_summary.dart';
+import 'package:uas_ezrent/widgets/booking/booking_veicle_details.dart';
 
 class BookingScreen extends StatefulWidget {
   final VehicleModel vehicle;
@@ -53,6 +57,7 @@ class _BookingScreenState extends State<BookingScreen> {
   String? _appliedPromoCode;
   UserModel? _currentUser;
   bool _isLoading = true;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -78,12 +83,12 @@ class _BookingScreenState extends State<BookingScreen> {
         });
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memuat profil: $e')),
-      );
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat profil: $e', style: GoogleFonts.poppins())),
+        );
+      }
     }
   }
 
@@ -117,8 +122,8 @@ class _BookingScreenState extends State<BookingScreen> {
           _discountAmount = (promo.discount as num).toDouble();
         }
         _discountAmount = _discountAmount > _originalPrice
-          ? _originalPrice
-          : _discountAmount;
+            ? _originalPrice
+            : _discountAmount;
         _totalPrice = _originalPrice - _discountAmount;
       });
 
@@ -144,8 +149,9 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  void _submitBooking() async {
+  Future<void> _submitBooking() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isSubmitting = true);
       try {
         final booking = BookingModel(
           id: '',
@@ -163,21 +169,29 @@ class _BookingScreenState extends State<BookingScreen> {
 
         final bookingId = await _bookingService.addBooking(booking);
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ConfirmationScreen(
-              vehicleDetails: '${widget.vehicle.brand} ${widget.vehicle.name}',
-              rentalDuration: widget.rentalDuration,
-              totalPrice: _totalPrice,
-              bookingId: bookingId,
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ConfirmationScreen(
+                vehicleDetails: '${widget.vehicle.brand} ${widget.vehicle.name}',
+                rentalDuration: widget.rentalDuration,
+                totalPrice: _totalPrice,
+                bookingId: bookingId,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal membuat booking: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal membuat booking: $e')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isSubmitting = false);
+        }
       }
     }
   }
@@ -186,26 +200,46 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
+        backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          title: const Text('Konfirmasi Booking'),
-          centerTitle: true,
+          backgroundColor: Colors.blueAccent,
+          elevation: 0,
+          title: Text(
+            'Konfirmasi Booking',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
         ),
         body: const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(Colors.blueAccent),
+            strokeWidth: 3,
+          ),
         ),
       );
     }
+
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Konfirmasi Booking'),
-        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        title: Text(
+          'Konfirmasi Booking',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.local_offer),
+            icon: const Icon(Icons.local_offer, color: Colors.black,),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PromoScreen()),
+                MaterialPageRoute(builder: (context) => const PromoScreen()),
               );
             },
           ),
@@ -213,319 +247,208 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${widget.vehicle.brand} ${widget.vehicle.name}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Tanggal Mulai: ${DateFormat('dd/MM/yyyy').format(_startDate)}',
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                'Tanggal Selesai: ${DateFormat('dd/MM/yyyy').format(_endDate)}',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Durasi: ${widget.rentalDuration} hari',
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Total Harga: Rp ${NumberFormat('#,###').format(_totalPrice)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                BookingVehicleDetails(
+                  vehicle: widget.vehicle,
+                  startDate: _startDate,
+                  endDate: _endDate,
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Informasi Pribadi',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama Lengkap',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon masukkan nama lengkap';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nomor Telepon',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon masukkan nomor telepon';
-                    }
-                    if (!RegExp(r'^[0-9]{10,12}$').hasMatch(value)) {
-                      return 'Nomor telepon tidak valid';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon masukkan email';
-                    }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Email tidak valid';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Alamat',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  maxLines: 3,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mohon masukkan alamat lengkap';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Metode Pembayaran',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Pilih Metode Pembayaran',
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                  ),
-                  value: _selectedPaymentMethod,
-                  items: _paymentMethods
-                      .map((method) => DropdownMenuItem(
-                            value: method,
-                            child: Text(method),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedPaymentMethod = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Mohon pilih metode pembayaran';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Kode Promo',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
+                const SizedBox(height: 24),
+                BookingFormSection(
+                  title: 'Informasi Pribadi',
                   children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _promoCodeController,
-                        decoration: InputDecoration(
-                          labelText: 'Masukkan Kode Promo',
-                          labelStyle: const TextStyle(color: Colors.black),
-                          border: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
-                          suffixIcon: _appliedPromoCode != null
-                            ?  Icon(Icons.check_circle, color: Colors.blue[400])
-                            : null,
-                        ),
-                      ),
+                    BookingInputField(
+                      controller: _nameController,
+                      label: 'Nama Lengkap',
+                      icon: Icons.person,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Mohon masukkan nama lengkap' : null,
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: _applyPromoCode,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    const SizedBox(height: 12),
+                    BookingInputField(
+                      controller: _phoneController,
+                      label: 'Nomor Telepon',
+                      icon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Mohon masukkan nomor telepon';
+                        }
+                        if (!RegExp(r'^[0-9]{10,12}$').hasMatch(value)) {
+                          return 'Nomor telepon tidak valid';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    BookingInputField(
+                      controller: _emailController,
+                      label: 'Email',
+                      icon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Mohon masukkan email';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
+                          return 'Email tidak valid';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    BookingInputField(
+                      controller: _addressController,
+                      label: 'Alamat',
+                      icon: Icons.location_on,
+                      maxLines: 3,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Mohon masukkan alamat lengkap' : null,
+                    ),
+                  ],
+                ),
+                BookingFormSection(
+                  title: 'Metode Pembayaran',
+                  children: [
+                    Card(
+                      elevation: 0,
+                      color: Colors.grey[100],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          width: 1,
+                          color: Colors.grey[300]!,
                         ),
-                        elevation: 5,
                       ),
-                      child: const Text(
-                        'Terapkan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedPaymentMethod,
+                          items: _paymentMethods.map((method) {
+                            return DropdownMenuItem<String>(
+                              value: method,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Text(
+                                  method,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value;
+                            });
+                          },
+                          validator: (value) => value == null ? 'Mohon pilih metode pembayaran' : null,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(Icons.payment, color: Colors.blueAccent),
+                            hintText: 'Pilih metode pembayaran',
+                            hintStyle: GoogleFonts.poppins(
+                              color: Colors.grey[400],
+                              fontSize: 14,
+                            ),
+                            alignLabelWithHint: true,
+                          ),
+                          style: GoogleFonts.poppins(
+                            color: Colors.black87,
+                            fontSize: 14,
+                          ),
+                          icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
+                          isExpanded: true,
+                          dropdownColor: Colors.white,
+                          alignment: AlignmentDirectional.centerStart,
                         ),
                       ),
                     ),
                   ],
                 ),
-                if (_appliedPromoCode != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'Promo $_appliedPromoCode diterapkan',
-                    style:  TextStyle(
-                      color: Colors.blue[400],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
+                BookingFormSection(
+                  title: 'Kode Promo',
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Harga Awal'),
-                            Text('Rp ${NumberFormat('#,###').format(_originalPrice)}'),
-                          ],
-                        ),
-                        if (_discountAmount > 0) ...[
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Diskon',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              Text(
-                                '- Rp ${NumberFormat('#,###').format(_discountAmount)}',
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
+                        Expanded(
+                          child: BookingInputField(
+                            controller: _promoCodeController,
+                            label: 'Masukkan Kode Promo',
+                            suffixIcon: _appliedPromoCode != null
+                                ? const Icon(Icons.check_circle,
+                                    color: Colors.blueAccent)
+                                : null,
                           ),
-                        ],
-                        const Divider(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Harga',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[400],
-                              ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: _applyPromoCode,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 24),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            Text(
-                              'Rp ${NumberFormat('#,###').format(_totalPrice)}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[400],
-                              ),
+                          ),
+                          child: Text(
+                            'Terapkan',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                    if (_appliedPromoCode != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Promo $_appliedPromoCode diterapkan',
+                        style: GoogleFonts.poppins(
+                          color: Colors.blue[400],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 24),
+                BookingPriceSummary(
+                  originalPrice: _originalPrice,
+                  discountAmount: _discountAmount,
+                ),
+                const SizedBox(height: 32),
                 SizedBox(
-                  width: double.infinity,
+                  height: 50,
                   child: ElevatedButton(
-                    onPressed: _submitBooking,
+                    onPressed: _isSubmitting ? null : _submitBooking,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Konfirmasi Booking',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isSubmitting
+                        ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
+                        : Text(
+                            'Konfirmasi dan Bayar',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -535,14 +458,6 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
-    _emailController.dispose();
-    _addressController.dispose();
-    _promoCodeController.dispose();
-    super.dispose();
-  }
 }
+
+

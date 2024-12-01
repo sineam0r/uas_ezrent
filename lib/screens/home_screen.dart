@@ -56,9 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(
               'Kendaraan Populer',
               style: GoogleFonts.poppins(
-                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                fontSize: 22,
               ),
             ),
           ),
