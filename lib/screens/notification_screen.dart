@@ -69,7 +69,7 @@ class NotificationScreen extends StatelessWidget {
               return TextButton(
                 onPressed: () => _markAllAsRead(context),
                   child: Text(
-                  'Tandai\nSudah Dibaca',
+                  'Baca Semua',
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,

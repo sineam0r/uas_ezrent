@@ -74,7 +74,7 @@ class ConfirmationScreen extends StatelessWidget {
                   Text(
                     'Nomor Booking: $bookingId',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       color: Colors.grey,
                     ),
                   ),

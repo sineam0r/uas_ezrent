@@ -102,6 +102,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
+          backgroundColor: Colors.grey[100],
           title: Text(
             'Riwayat Rentalku',
             style: GoogleFonts.poppins(

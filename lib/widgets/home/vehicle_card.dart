@@ -32,7 +32,7 @@ class VehicleCard extends StatelessWidget {
               ),
               child: Image.asset(
                 vehicle.imageUrl,
-                height: 160,
+                height: 135,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),

@@ -89,6 +89,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
+        backgroundColor: Colors.grey[100],
         title: Text(
           'Kendaraan Favoritku',
           style: GoogleFonts.poppins(

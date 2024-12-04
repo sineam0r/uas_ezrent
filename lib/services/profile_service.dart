@@ -26,6 +26,23 @@ class ProfileService {
     }
   }
 
+  Future<UserModel?> getUserProfile(String userId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (snapshot.exists) {
+        return UserModel.fromMap(snapshot.data()!, snapshot.id);
+      }
+      return null;
+    } catch (e) {
+      print('Error getting user profile: $e');
+      return null;
+    }
+  }
+
   Future<bool> updateProfile({
     String? name,
     String? phoneNumber,

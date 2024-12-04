@@ -73,6 +73,24 @@ class BookingService {
     }
   }
 
+  Future<BookingModel?> getBooking(String bookingId) async {
+    try {
+      final docSnapshot = await _firestore
+          .collection('bookings')
+          .doc(bookingId)
+          .get();
+
+      if (!docSnapshot.exists) {
+        return null;
+      }
+
+      return BookingModel.fromMap(docSnapshot.data()!, docSnapshot.id);
+    } catch (e) {
+      print('Error fetching booking: $e');
+      return null;
+    }
+  }
+
   void _delayedStatusUpdate(String bookingId) {
     Future.delayed(Duration(seconds: Random().nextInt(11) + 5), () async {
       try {
