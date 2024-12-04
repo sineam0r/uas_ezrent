@@ -23,7 +23,7 @@ class NotificationContent extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 4),
           elevation: 0,
-          color: Colors.white,
+          color: notification.isRead ? Colors.white : Colors.blue[50],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
             side: BorderSide(
@@ -46,11 +46,17 @@ class NotificationContent extends StatelessWidget {
             onDismissed: (direction) async {
               await notificationService.deleteNotification(notification.id);
             },
+            child: InkWell(
+              onTap: () async {
+                if (!notification.isRead) {
+                  await notificationService.markNotificationAsRead(notification.id);
+                }
+              },
             child: ListTile(
               title: Text(
                 notification.title,
                 style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w600,
                 ),
               ),
               subtitle: Column(
@@ -74,6 +80,17 @@ class NotificationContent extends StatelessWidget {
                 horizontal: 16,
                 vertical: 8,
               ),
+              trailing: !notification.isRead
+                    ? Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                      )
+                    : null,
+            ),
             ),
           ),
         );

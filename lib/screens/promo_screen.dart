@@ -13,21 +13,21 @@ class PromoScreen extends StatelessWidget {
         description: 'Untuk semua kendaraan baru',
         code: 'NEWWEEK50',
         discount: 0.5,
-        validUntil: DateTime.now().add(const Duration(days: 7)),
+        validUntil: DateTime(2024, 12, 31),
       ),
       PromoModel(
         title: 'Promo Akhir Tahun',
         description: 'Hemat sampai Rp 100.000',
         code: 'NEWYEAR100',
         discount: 100000,
-        validUntil: DateTime.now().add(const Duration(days: 30)),
+        validUntil: DateTime(2024, 12, 25),
       ),
       PromoModel(
         title: 'Diskon Motor Baru',
         description: 'Khusus kendaraan roda dua',
         code: 'MOTOR20',
         discount: 0.2,
-        validUntil: DateTime.now().add(const Duration(days: 14)),
+        validUntil: DateTime(2024, 12, 02),
       ),
     ];
   }

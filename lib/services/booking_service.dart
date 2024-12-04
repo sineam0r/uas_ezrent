@@ -41,12 +41,55 @@ class BookingService {
     }
   }
 
+  Future<List> getVehicleActiveBookings(String vehicleId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('bookings')
+          .where('vehicleId', isEqualTo: vehicleId)
+          .where('status', whereIn: ['pending', 'confirmed'])
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => BookingModel.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      print('Error fetching vehicle bookings: $e');
+      rethrow;
+    }
+  }
+
+  Future<bool> isVehicleAvailable(String vehicleId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('bookings')
+          .where('vehicleId', isEqualTo: vehicleId)
+          .where('status', whereNotIn: ['finished', 'cancelled'])
+          .get();
+
+      return querySnapshot.docs.isEmpty;
+    } catch (e) {
+      print('Error checking vehicle availability: $e');
+      return false;
+    }
+  }
+
   void _delayedStatusUpdate(String bookingId) {
     Future.delayed(Duration(seconds: Random().nextInt(11) + 5), () async {
       try {
         final bookingDoc = await _firestore.collection('bookings').doc(bookingId).get();
         if (bookingDoc.exists && bookingDoc.data()?['status'] == 'pending') {
           await updateBookingStatus(bookingId, 'confirmed');
+
+          Future.delayed(Duration(seconds: Random().nextInt(30) + 60), () async {
+            try {
+              final updatedDoc = await _firestore.collection('bookings').doc(bookingId).get();
+              if (updatedDoc.exists && updatedDoc.data()?['status'] == 'confirmed') {
+                await updateBookingStatus(bookingId, 'finished');
+              }
+            } catch (e) {
+              print('Error updating to finished status: $e');
+            }
+          });
         }
       } catch (e) {
         print('Error in delayed status update: $e');
@@ -81,9 +124,21 @@ class BookingService {
         'status': status,
       });
 
+      String message;
+      switch (status) {
+        case 'confirmed':
+          message = 'Booking Anda telah dikonfirmasi';
+          break;
+        case 'finished':
+          message = 'Booking Anda telah selesai';
+          break;
+        default:
+          message = 'Status booking Anda telah diubah menjadi $status';
+      }
+
       await _notificationService.addNotification(
         title: 'Status Booking Diperbarui',
-        message: 'Status booking Anda telah diubah menjadi $status',
+        message: message,
         bookingId: bookingId,
         type: 'booking_status_update',
       );

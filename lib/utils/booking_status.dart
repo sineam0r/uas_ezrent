@@ -7,6 +7,8 @@ class BookingStatus {
         return Colors.orange;
       case 'confirmed':
         return Colors.green;
+      case 'finished':
+        return Colors.blueAccent;
       case 'cancelled':
         return Colors.red;
       default:

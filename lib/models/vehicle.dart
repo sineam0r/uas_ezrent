@@ -64,4 +64,28 @@ class VehicleModel {
       'isAvailable': isAvailable,
     };
   }
+
+  VehicleModel copyWith({
+    String? id,
+    String? name,
+    String? type,
+    String? brand,
+    double? pricePerDay,
+    String? imageUrl,
+    int? year,
+    String? transmission,
+    bool? isAvailable,
+  }) {
+    return VehicleModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      brand: brand ?? this.brand,
+      pricePerDay: pricePerDay ?? this.pricePerDay,
+      imageUrl: imageUrl ?? this.imageUrl,
+      year: year ?? this.year,
+      transmission: transmission ?? this.transmission,
+      isAvailable: isAvailable ?? this.isAvailable,
+    );
+  }
 }

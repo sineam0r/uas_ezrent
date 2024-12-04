@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uas_ezrent/data/dummy_vehicles.dart';
 import 'package:uas_ezrent/models/booking.dart';
+import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/screens/booking_detail_screen.dart';
 import 'package:uas_ezrent/widgets/history/history_content.dart';
@@ -34,10 +36,41 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
+  void _updateDummyVehicleAvailability(String vehicleId, bool isAvailable) {
+    final vehicleIndex = DummyVehicles.popularVehicles.indexWhere((v) => v.id == vehicleId);
+    if (vehicleIndex != -1) {
+      final oldVehicle = DummyVehicles.popularVehicles[vehicleIndex];
+      final newVehicle = VehicleModel(
+        id: oldVehicle.id,
+        name: oldVehicle.name,
+        type: oldVehicle.type,
+        brand: oldVehicle.brand,
+        pricePerDay: oldVehicle.pricePerDay,
+        imageUrl: oldVehicle.imageUrl,
+        year: oldVehicle.year,
+        transmission: oldVehicle.transmission,
+        isAvailable: isAvailable,
+      );
+      DummyVehicles.popularVehicles[vehicleIndex] = newVehicle;
+    }
+  }
+
+  Future<void> _handleBookingStatusChange(BookingModel booking) async {
+    if (booking.status != 'finished' && booking.status != 'cancelled') {
+      _updateDummyVehicleAvailability(booking.vehicleId, false);
+    } else {
+      _updateDummyVehicleAvailability(booking.vehicleId, true);
+    }
+  }
+
   Future<void> _fetchBookings() async {
     try {
       _bookingsSubscription = _bookingService.getUserBookings().listen(
         (bookings) {
+          for (var booking in bookings) {
+            _handleBookingStatusChange(booking);
+          }
+
           setState(() {
             _bookings = bookings;
             _isLoading = false;
@@ -100,6 +133,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           onDelete: (booking) async {
             try {
               await _bookingService.deleteBooking(booking.id);
+              _updateDummyVehicleAvailability(booking.vehicleId, true);
               setState(() {
                 _bookings!.remove(booking);
               });

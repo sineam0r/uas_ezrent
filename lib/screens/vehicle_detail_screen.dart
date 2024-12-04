@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
+import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/widgets/detail/vehicle_booking_button.dart';
 import 'package:uas_ezrent/widgets/detail/vehicle_info_row.dart';
 import 'package:uas_ezrent/widgets/detail/vehicle_price_section.dart';
@@ -21,11 +22,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
   bool _isFavorite = false;
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _isVehicleAvailable = true;
+
+  final BookingService _bookingService = BookingService();
 
   @override
   void initState() {
     super.initState();
     _checkFavoriteStatus();
+    _checkVehicleAvailability();
   }
 
   Future<void> _checkFavoriteStatus() async {
@@ -45,6 +50,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       });
     } catch (e) {
       print('Error checking favorite status: $e');
+    }
+  }
+
+  Future<void> _checkVehicleAvailability() async {
+    try {
+      final bookings = await _bookingService.getVehicleActiveBookings(widget.vehicle.id);
+      setState(() {
+        _isVehicleAvailable = bookings.isEmpty;
+      });
+    } catch (e) {
+      print('Error checking vehicle availability: $e');
+      setState(() {
+        _isVehicleAvailable = false;
+      });
     }
   }
 
@@ -275,6 +294,17 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                 ],
               ),
             ),
+            if (!_isVehicleAvailable)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(
+                  'Kendaraan sedang tidak tersedia untuk disewa',
+                  style: GoogleFonts.poppins(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -283,6 +313,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
         selectedRentalDuration: _rentalDuration,
         startDate: _startDate,
         endDate: _endDate,
+        isVehicleAvailable: _isVehicleAvailable,
       ),
     );
   }

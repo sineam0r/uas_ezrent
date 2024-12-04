@@ -61,4 +61,6 @@ class BookingModel {
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
+
+  static fromFirestore(QueryDocumentSnapshot<Map<String, dynamic>> doc) {}
 }

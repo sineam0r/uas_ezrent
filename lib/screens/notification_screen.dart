@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/notification.dart';
@@ -8,6 +10,32 @@ class NotificationScreen extends StatelessWidget {
   final NotificationService _notificationService = NotificationService();
 
   NotificationScreen({super.key});
+
+  Future<void> _markAllAsRead(BuildContext context) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final batch = FirebaseFirestore.instance.batch();
+    final notifications = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('notifications')
+        .where('isRead', isEqualTo: false)
+        .get();
+
+    for (var doc in notifications.docs) {
+      batch.update(doc.reference, {'isRead': true});
+    }
+
+    await batch.commit();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Semua notifikasi telah ditandai sebagai dibaca'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +52,34 @@ class NotificationScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.blueAccent,
         elevation: 0,
+        actions: [
+          StreamBuilder<List<NotificationModel>>(
+            stream: _notificationService.getUserNotifications(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const SizedBox();
+              }
+
+              final hasUnread = snapshot.data!.any((notification) => !notification.isRead);
+              
+              if (!hasUnread) {
+                return const SizedBox();
+              }
+
+              return TextButton(
+                onPressed: () => _markAllAsRead(context),
+                  child: Text(
+                  'Tandai\nSudah Dibaca',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: StreamBuilder<List<NotificationModel>>(
         stream: _notificationService.getUserNotifications(),

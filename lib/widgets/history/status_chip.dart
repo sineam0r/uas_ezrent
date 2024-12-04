@@ -23,6 +23,11 @@ class StatusChip extends StatelessWidget {
         textColor = Colors.green[800]!;
         displayText = 'Dikonfirmasi';
         break;
+      case 'finished':
+        backgroundColor = Colors.blue[100]!;
+        textColor = Colors.blue[800]!;
+        displayText = 'Selesai';
+        break;
       case 'cancelled':
         backgroundColor = Colors.red[100]!;
         textColor = Colors.red[800]!;

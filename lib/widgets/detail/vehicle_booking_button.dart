@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/vehicle.dart';
 import 'package:uas_ezrent/screens/booking_screen.dart';
 
@@ -7,80 +8,75 @@ class VehicleBookingButton extends StatelessWidget {
   final int selectedRentalDuration;
   final DateTime? startDate;
   final DateTime? endDate;
-  final VoidCallback? onBooking;
+  final bool isVehicleAvailable;
 
   const VehicleBookingButton({
     super.key,
     required this.vehicle,
     required this.selectedRentalDuration,
-    this.startDate,
-    this.endDate,
-    this.onBooking,
+    required this.startDate,
+    required this.endDate,
+    required this.isVehicleAvailable,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    final bool isBookingEnabled =
+      startDate != null &&
+      endDate != null &&
+      selectedRentalDuration > 0 &&
+      isVehicleAvailable;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
       child: ElevatedButton(
-        onPressed: vehicle.isAvailable
+        onPressed: isBookingEnabled
             ? () {
-                if (onBooking != null) {
-                  onBooking!();
-                } else {
-                  if (selectedRentalDuration == 0 || startDate == null || endDate == null) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Peringatan'),
-                          content: const Text(
-                            'Mohon pilih durasi rental terlebih dahulu'
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Oke'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BookingScreen(
-                          vehicle: vehicle,
-                          rentalDuration: selectedRentalDuration,
-                          startDate: startDate!,
-                          endDate: endDate!,
-                        ),
-                      ),
-                    );
-                  }
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookingScreen(
+                      vehicle: vehicle,
+                      startDate: startDate!,
+                      endDate: endDate!,
+                      rentalDuration: selectedRentalDuration,
+                    ),
+                  ),
+                );
               }
             : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blueAccent,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey[400],
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: Text(
-          vehicle.isAvailable ? 'Booking Sekarang' : 'Tidak Tersedia',
-          style: const TextStyle(
+          !isVehicleAvailable
+            ? 'Kendaraan Tidak Tersedia'
+            : (isBookingEnabled
+              ? 'Lanjutkan Booking'
+              : 'Pilih Tanggal Rental'),
+          style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
       ),
     );
   }
 }
-
