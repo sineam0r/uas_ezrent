@@ -13,6 +13,10 @@ class BookingModel {
   final String paymentMethod;
   final String status;
   final DateTime createdAt;
+  final String? userName;
+  final String? userPhone;
+  final String? userEmail;
+  final String? userAddress;
 
   BookingModel({
     required this.id,
@@ -27,6 +31,10 @@ class BookingModel {
     required this.paymentMethod,
     this.status = 'pending',
     DateTime? createdAt,
+    this.userName,
+    this.userPhone,
+    this.userEmail,
+    this.userAddress,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory BookingModel.fromMap(Map<String, dynamic> map, String documentId) {
@@ -43,6 +51,10 @@ class BookingModel {
       paymentMethod: map['paymentMethod'],
       status: map['status'] ?? 'pending',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
+      userName: map['userName'],
+      userPhone: map['userPhone'],
+      userEmail: map['userEmail'],
+      userAddress: map['userAddress'],
     );
   }
 
@@ -59,6 +71,10 @@ class BookingModel {
       'paymentMethod': paymentMethod,
       'status': status,
       'createdAt': FieldValue.serverTimestamp(),
+      'userName': userName,
+      'userPhone': userPhone,
+      'userEmail': userEmail,
+      'userAddress': userAddress,
     };
   }
 

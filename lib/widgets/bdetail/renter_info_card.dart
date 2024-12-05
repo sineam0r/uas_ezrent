@@ -4,25 +4,14 @@ import 'package:uas_ezrent/models/booking.dart';
 
 class RenterInfoCard extends StatelessWidget {
   final BookingModel booking;
-  final String name;
-  final String phoneNumber;
-  final String email;
-  final String address;
 
-  const RenterInfoCard({
-    super.key,
-    required this.booking,
-    required this.name,
-    required this.phoneNumber,
-    required this.email,
-    required this.address,
-  });
+  const RenterInfoCard({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
       color: Colors.white,
+      elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -31,29 +20,13 @@ class RenterInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow(
-              Icons.person,
-              'Nama Lengkap',
-              name,
-            ),
+            _buildInfoRow(Icons.person, 'Nama', booking.userName ?? 'Tidak tersedia'),
             const SizedBox(height: 12),
-            _buildInfoRow(
-              Icons.phone,
-              'Nomor Telepon',
-              phoneNumber,
-            ),
+            _buildInfoRow(Icons.phone, 'Nomor Telepon', booking.userPhone ?? 'Tidak tersedia'),
             const SizedBox(height: 12),
-            _buildInfoRow(
-              Icons.email,
-              'Email',
-              email,
-            ),
+            _buildInfoRow(Icons.email, 'Email', booking.userEmail ?? 'Tidak tersedia'),
             const SizedBox(height: 12),
-            _buildInfoRow(
-              Icons.location_on,
-              'Alamat',
-              address,
-            ),
+            _buildInfoRow(Icons.location_on, 'Alamat', booking.userAddress ?? 'Tidak tersedia'),
           ],
         ),
       ),
@@ -62,9 +35,8 @@ class RenterInfoCard extends StatelessWidget {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.blueAccent, size: 20),
+        Icon(icon, color: Colors.blueAccent, size: 24),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -73,14 +45,14 @@ class RenterInfoCard extends StatelessWidget {
               Text(
                 label,
                 style: GoogleFonts.poppins(
+                  fontSize: 14,
                   color: Colors.grey[600],
-                  fontSize: 12,
                 ),
               ),
               Text(
                 value,
                 style: GoogleFonts.poppins(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),

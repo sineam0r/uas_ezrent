@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uas_ezrent/models/booking.dart';
 import 'package:uas_ezrent/widgets/bdetail/rental_detail_card.dart';
 import 'package:uas_ezrent/widgets/bdetail/cancel_booking_button.dart';
+import 'package:uas_ezrent/widgets/bdetail/renter_info_card.dart';
 import 'package:uas_ezrent/widgets/bdetail/vehicle_info_card.dart';
 
 class BookingDetailScreen extends StatelessWidget {
@@ -48,6 +49,16 @@ class BookingDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               VehicleInfoCard(booking: booking),
+              const SizedBox(height: 24),
+              Text(
+                'Informasi Penyewa',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
+              const SizedBox(height: 16),
+              RenterInfoCard(booking: booking),
               const SizedBox(height: 24),
               Text(
                 'Detail Penyewaan',

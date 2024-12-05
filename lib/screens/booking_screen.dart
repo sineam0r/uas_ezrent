@@ -8,7 +8,6 @@ import 'package:uas_ezrent/screens/promo_screen.dart';
 import 'package:uas_ezrent/services/booking_service.dart';
 import 'package:uas_ezrent/services/profile_service.dart';
 import 'package:uas_ezrent/screens/confirmation_screen.dart';
-import 'package:uas_ezrent/widgets/bdetail/renter_info_card.dart';
 import 'package:uas_ezrent/widgets/booking/booking_form_section.dart';
 import 'package:uas_ezrent/widgets/booking/booking_input_field.dart';
 import 'package:uas_ezrent/widgets/booking/booking_price_summary.dart';
@@ -166,6 +165,10 @@ class _BookingScreenState extends State<BookingScreen> {
           totalPrice: _totalPrice,
           paymentMethod: _selectedPaymentMethod!,
           createdAt: DateTime.now(),
+          userName: _nameController.text,
+          userPhone: _phoneController.text,
+          userEmail: _emailController.text,
+          userAddress: _addressController.text,
         );
 
         final bookingId = await _bookingService.addBooking(booking);
@@ -317,30 +320,6 @@ class _BookingScreenState extends State<BookingScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-              BookingFormSection(
-                title: 'Pratinjau Informasi Penyewa',
-                children: [
-                  RenterInfoCard(
-                    booking: BookingModel(
-                      id: '',
-                      userId: _currentUser?.id ?? '',
-                      vehicleId: widget.vehicle.id,
-                      vehicleName: widget.vehicle.name,
-                      vehicleBrand: widget.vehicle.brand,
-                      startDate: _startDate,
-                      endDate: _endDate,
-                      rentalDuration: widget.rentalDuration,
-                      totalPrice: _totalPrice,
-                      paymentMethod: _selectedPaymentMethod ?? '',
-                      createdAt: DateTime.now(),
-                    ),
-                    name: _nameController.text,
-                    phoneNumber: _phoneController.text,
-                    email: _emailController.text,
-                    address: _addressController.text,
-                  ),
-                ],
-              ),
                 BookingFormSection(
                   title: 'Metode Pembayaran',
                   children: [
