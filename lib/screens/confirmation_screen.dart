@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   final String vehicleDetails;
@@ -20,7 +21,10 @@ class ConfirmationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Konfirmasi Booking', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Konfirmasi Booking',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -45,7 +49,7 @@ class ConfirmationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     'Booking Berhasil!',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue[400],
@@ -54,17 +58,17 @@ class ConfirmationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     'Kendaraan: $vehicleDetails',
-                    style: const TextStyle(fontSize: 18),
+                    style: GoogleFonts.poppins(fontSize: 18),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Durasi Rental: $rentalDuration hari',
-                    style: const TextStyle(fontSize: 18),
+                    style: GoogleFonts.poppins(fontSize: 18),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Total Harga: Rp ${NumberFormat('#,###').format(totalPrice)}',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue[400],
@@ -73,7 +77,7 @@ class ConfirmationScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Nomor Booking: $bookingId',
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Colors.grey,
                     ),
@@ -90,9 +94,9 @@ class ConfirmationScreen extends StatelessWidget {
                         vertical: 12,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Kembali ke Beranda',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         color: Colors.white,
                       ),
